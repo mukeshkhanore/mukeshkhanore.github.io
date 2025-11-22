@@ -155,30 +155,35 @@
         {
             "title": "Transition metals: Matching microscopic quantum dynamics with macroscopic magnetic order",
             "meta": "AIP Advances 15, 3 (2025)",
-            "authors": "Janiš Václav and Khanore Mukesh"
+            "authors": "Janiš Václav and Khanore Mukesh",
+            "url": "https://doi.org/10.1063/9.0000859"
         },
         {
             "title": "Quantum dynamics in symmetry-breaking states of correlated electrons",
             "meta": "arXiv:2410.06831 (2024)",
-            "authors": "Janiš Václav, Khanore Mukesh, and Klíč Antonín"
+            "authors": "Janiš Václav, Khanore Mukesh, and Klíč Antonín",
+            "url": "https://arxiv.org/abs/2410.06831"
         },
         {
             "title": "The Quantum Vortex States in Extended Bose-Hubbard Model",
             "meta": "Eur. Phys. J. D 76, 16 (2022)",
             "authors": "Mukesh Khanore and Bishwajyoti Dey",
-            "description": "Investigated effects of lattice geometries, inter-particle interactions, and spatial inhomogeneity on quantum vortex states."
+            "description": "Investigated effects of lattice geometries, inter-particle interactions, and spatial inhomogeneity on quantum vortex states.",
+            "url": "https://doi.org/10.1140/epjd/s10053-022-00350-5"
         },
         {
             "title": "Coexistence of Mott and Superfluid Domain of Bosons",
             "meta": "AIP Conf. Proc. 1665, 030033 (2015)",
             "authors": "Mukesh Khanore and Bishwajyoti Dey",
-            "description": "Analyzed the coexistence of Mott insulator and superfluid phases for bosons confined in an optical lattice."
+            "description": "Analyzed the coexistence of Mott insulator and superfluid phases for bosons confined in an optical lattice.",
+            "url": "https://doi.org/10.1063/1.4917674"
         },
         {
             "title": "Bose-Hubbard Model with Attractive Interactions",
             "meta": "AIP Conf. Proc. 1591, 139 (2014)",
             "authors": "Mukesh Khanore and Bishwajyoti Dey",
-            "description": "Studied the Bose-Hubbard model with attractive interactions in the presence of an inhomogeneous lattice potential."
+            "description": "Studied the Bose-Hubbard model with attractive interactions in the presence of an inhomogeneous lattice potential.",
+            "url": "https://doi.org/10.1063/1.4872558"
         }
     ],
     "activities": [
@@ -204,17 +209,23 @@
         }
     ],
     "skills": {
+        "ml_tools": [
+            "NN",
+            "GNN",
+            "TensorFlow",
+            "PyTorch"
+        ],
         "languages": [
             "Python",
             "FORTRAN",
             "C",
-            "SQL",
             "VASP",
-            "TensorFlow",
             "Julia",
             "Qiskit",
             "Mathematica",
-            "LaTeX"
+            "LaTeX",
+            "ASE",
+            "DScribe"
         ],
         "numerical": [
             "Davidson Diagonalization Method",
