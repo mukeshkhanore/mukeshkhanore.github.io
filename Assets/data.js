@@ -32,8 +32,8 @@ const portfolioData = {
             "period": "Oct 2022 - Present",
             "details": [
                 "Developing machine learning-based approaches to optimize large-scale atomic simulations (perovskites).",
-                "Working on reducing computational costs of simulations while maintaining accuracy.",
-                "Supervision: Prof. Pavel Marton, Dept. of Dielectrics."
+                "Working on reducing computational costs of simulations while maintaining accuracy."
+
             ]
         },
         {
