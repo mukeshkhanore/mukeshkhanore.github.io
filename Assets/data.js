@@ -75,49 +75,49 @@ const portfolioData = {
     ],
     "projects": [
         {
-            "name": "1d_hubbard_model",
+            "name": "1D Hubbard Model",
             "url": "https://github.com/mukeshkhanore/1d_hubbard_model",
             "meta": "Physics Simulation",
             "description": "Numerical simulation of the 1D Hubbard model for correlated electron systems.",
             "tags": ["Python", "Physics"]
         },
         {
-            "name": "Qiskit_testing",
+            "name": "Qiskit Testing",
             "url": "https://github.com/mukeshkhanore/Qiskit_testing",
             "meta": "Quantum Computing",
             "description": "Experiments and tests using IBM's Qiskit framework for quantum circuits.",
             "tags": ["Qiskit", "Python"]
         },
         {
-            "name": "percolation_project",
+            "name": "Percolation Project",
             "url": "https://github.com/mukeshkhanore/percolation_project",
             "meta": "Statistical Mechanics",
             "description": "Simulation of percolation thresholds and cluster formation in lattice structures.",
             "tags": ["Simulation"]
         },
         {
-            "name": "map_plotting_python",
+            "name": "Map Plotting Python",
             "url": "https://github.com/mukeshkhanore/map_plotting_python",
             "meta": "Data Visualization",
             "description": "Tools and scripts for plotting geospatial data and maps using Python.",
             "tags": ["Matplotlib", "Geo"]
         },
         {
-            "name": "grided_data",
+            "name": "Gridded Data",
             "url": "https://github.com/mukeshkhanore/grided_data",
             "meta": "Data Processing",
             "description": "Handling and processing grid-based datasets for scientific analysis.",
             "tags": []
         },
         {
-            "name": "any_base_number_representation",
+            "name": "Any Base Number Representation",
             "url": "https://github.com/mukeshkhanore/any_base_number_representation",
             "meta": "Algorithms",
             "description": "Utilities for converting numbers between arbitrary bases.",
             "tags": []
         },
         {
-            "name": "remote_access",
+            "name": "Remote Access",
             "url": "https://github.com/mukeshkhanore/remote_access",
             "meta": "Utilities",
             "description": "Scripts and tools for managing remote connections.",
@@ -171,7 +171,7 @@ const portfolioData = {
             "description": "Workshop organized by ICTP."
         },
         {
-            "title": "e-INFRA CZ CONFERENCE",
+            "title": "e-INFRA CZ Conference",
             "meta": "Apr 29-30, 2024 | Prague",
             "description": "Attendee."
         },

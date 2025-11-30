@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Create particle array
     function init() {
         particlesArray = [];
-        let numberOfParticles = (canvas.height * canvas.width) / 6000; // Increased density (was 9000)
+        let numberOfParticles = (canvas.height * canvas.width) / 10000; // Reduced density for performance (was 6000)
         for (let i = 0; i < numberOfParticles; i++) {
             particlesArray.push(new Particle());
         }
