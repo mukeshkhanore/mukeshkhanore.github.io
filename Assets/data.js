@@ -75,6 +75,13 @@ const portfolioData = {
     ],
     "projects": [
         {
+            "name": "Descriptors Visualization",
+            "url": "https://github.com/mukeshkhanore/descriptors_visualization",
+            "meta": "Material Science",
+            "description": "GUI tool for generating and visualizing descriptors for atomic structures.",
+            "tags": ["Python", "GUI", "Material Science"]
+        },
+        {
             "name": "1D Hubbard Model",
             "url": "https://github.com/mukeshkhanore/1d_hubbard_model",
             "meta": "Physics Simulation",
