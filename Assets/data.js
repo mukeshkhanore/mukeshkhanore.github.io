@@ -8,7 +8,8 @@ const portfolioData = {
             { "name": "Email", "icon": "fas fa-envelope", "url": "mailto:mukeshkhanore@gmail.com" },
             { "name": "LinkedIn", "icon": "fab fa-linkedin", "url": "https://www.linkedin.com/in/mukesh-prakash-k-32739419/" },
             { "name": "GitHub", "icon": "fab fa-github", "url": "https://github.com/mukeshkhanore" },
-            { "name": "ResearchGate", "icon": "fab fa-researchgate", "url": "https://www.researchgate.net/profile/Mukeshkumar-Khanore" }
+            { "name": "ResearchGate", "icon": "fab fa-researchgate", "url": "https://www.researchgate.net/profile/Mukeshkumar-Khanore" },
+            { "name": "ORCID", "icon": "fab fa-orcid", "url": "https://orcid.org/0009-0008-1487-3562" }
         ]
     },
     "education": [
