@@ -1,214 +1,307 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Security: Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://app.usercentrics.eu; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://www.google-analytics.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://app.usercentrics.eu;">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://app.usercentrics.eu; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://www.google-analytics.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://app.usercentrics.eu https://api.usercentrics.eu;"
+    />
     <!-- Security: Upgrade insecure requests to HTTPS -->
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="upgrade-insecure-requests"
+    />
     <!-- Usercentrics Cookie Consent Banner -->
-    <script id="usercentrics-cmp" src="https://app.usercentrics.eu/browser-ui/latest/loader.js"
-        data-settings-id="OZcmH5GlOaBmhO" async></script>
+    <script
+      id="usercentrics-cmp"
+      src="https://app.usercentrics.eu/browser-ui/latest/loader.js"
+      data-settings-id="OZcmH5GlOaBmhO"
+      async
+    ></script>
 
     <title>Mukesh Khanore - Physics PhD & Data Scientist</title>
-    <link rel="stylesheet" href="Assets/style.css">
+    <link rel="stylesheet" href="Assets/style.css" />
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <!-- FontAwesome (Security: SRI hash for CDN integrity) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
 
-    <!-- Google Analytics 4 -->
-    <!-- TODO: Replace 'G-XXXXXXXXXX' with your actual Google Analytics Measurement ID -->
-    <!-- Get your ID from: https://analytics.google.com -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y8665QV2J8"></script>
+    <!-- Google Analytics 4 (Consent-Gated via Usercentrics) -->
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
+      // GA4 Measurement ID
+      const GA_MEASUREMENT_ID = "G-Y8665QV2J8";
 
-        // TODO: Replace 'G-XXXXXXXXXX' below with your actual Measurement ID
-        gtag('config', 'G-Y8665QV2J8', {
-            'anonymize_ip': true,  // Privacy: Anonymize IP addresses
-            'cookie_flags': 'SameSite=None;Secure'  // Security: Secure cookies
-        });
+      // Initialize dataLayer
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+
+      // Set default consent to denied (will be updated by Usercentrics)
+      gtag("consent", "default", {
+        analytics_storage: "denied",
+        ad_storage: "denied",
+        wait_for_update: 500, // Wait for consent manager
+      });
+
+      // Function to load GA script dynamically
+      function loadGoogleAnalytics() {
+        if (document.querySelector('script[src*="googletagmanager.com/gtag"]'))
+          return;
+
+        const script = document.createElement("script");
+        script.async = true;
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+        document.head.appendChild(script);
+
+        script.onload = function () {
+          gtag("js", new Date());
+          gtag("config", GA_MEASUREMENT_ID, {
+            anonymize_ip: true,
+            cookie_flags: "SameSite=None;Secure",
+          });
+          console.log("[GA] Google Analytics loaded with consent");
+        };
+      }
+
+      // Listen for Usercentrics consent events
+      window.addEventListener("UC_UI_CMP_EVENT", function (event) {
+        if (event.detail && event.detail.type === "ACCEPT_ALL") {
+          gtag("consent", "update", {
+            analytics_storage: "granted",
+          });
+          loadGoogleAnalytics();
+        } else if (event.detail && event.detail.type === "DENY_ALL") {
+          gtag("consent", "update", {
+            analytics_storage: "denied",
+          });
+          console.log("[GA] Analytics consent denied");
+        } else if (event.detail && event.detail.type === "SAVE") {
+          // Check specific service consent via Usercentrics API
+          if (typeof UC_UI !== "undefined" && UC_UI.getServicesBaseInfo) {
+            const services = UC_UI.getServicesBaseInfo();
+            const gaService = services.find(
+              (s) =>
+                s.name.toLowerCase().includes("google analytics") ||
+                s.name.toLowerCase().includes("ga4"),
+            );
+            if (gaService && gaService.consent && gaService.consent.status) {
+              gtag("consent", "update", {
+                analytics_storage: "granted",
+              });
+              loadGoogleAnalytics();
+            }
+          }
+        }
+      });
+
+      // Check if consent was already given (returning visitor)
+      window.addEventListener("UC_UI_INITIALIZED", function () {
+        if (
+          typeof UC_UI !== "undefined" &&
+          UC_UI.areAllConsentsAccepted &&
+          UC_UI.areAllConsentsAccepted()
+        ) {
+          gtag("consent", "update", {
+            analytics_storage: "granted",
+          });
+          loadGoogleAnalytics();
+        }
+      });
     </script>
-</head>
+  </head>
 
-<body>
+  <body>
     <!-- Global Background Animation -->
     <canvas id="bg-canvas"></canvas>
 
     <header>
-        <div class="container">
-            <nav>
-                <div class="logo">MK.</div>
-                <ul class="nav-links">
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#experience">Experience</a></li>
-                    <li><a href="#education">Education</a></li>
-                    <li><a href="#publications">Publications</a></li>
-                    <li><a href="#activities">Activities</a></li>
-                    <li><a href="#skills">Skills</a></li>
-                    <li><a href="#certificates">Certificates</a></li>
-                    <li><a href="#teaching">Teaching</a></li>
-                    <li><a href="#projects">Projects</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-                <button id="hamburger" class="hamburger" aria-label="Toggle Navigation">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <button id="theme-toggle" class="theme-toggle" title="Switch Theme">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </nav>
-        </div>
+      <div class="container">
+        <nav>
+          <div class="logo">MK.</div>
+          <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#education">Education</a></li>
+            <li><a href="#publications">Publications</a></li>
+            <li><a href="#activities">Activities</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#certificates">Certificates</a></li>
+            <li><a href="#teaching">Teaching</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+          <button
+            id="hamburger"
+            class="hamburger"
+            aria-label="Toggle Navigation"
+          >
+            <i class="fas fa-bars"></i>
+          </button>
+          <button id="theme-toggle" class="theme-toggle" title="Switch Theme">
+            <i class="fas fa-moon"></i>
+          </button>
+        </nav>
+      </div>
     </header>
 
     <main>
-        <section id="about" class="hero">
-            <div class="container">
-                <div class="hero-card">
-                    <div class="profile-photo-container">
-                        <img id="profile-avatar" src="" alt="Profile" class="profile-photo" fetchpriority="high">
-                    </div>
-                    <h1 id="profile-name">Loading...</h1>
-                    <p id="profile-titles"></p>
-                    <p id="profile-bio" style="max-width: 800px; margin: 0 auto var(--spacing-lg);"></p>
-
-                    <div id="social-links" class="social-links">
-                        <!-- Social links rendered via JS -->
-                    </div>
-                </div>
+      <section id="about" class="hero">
+        <div class="container">
+          <div class="hero-card">
+            <div class="profile-photo-container">
+              <img
+                id="profile-avatar"
+                src=""
+                alt="Profile"
+                class="profile-photo"
+                fetchpriority="high"
+              />
             </div>
-        </section>
+            <h1 id="profile-name">Loading...</h1>
+            <p id="profile-titles"></p>
+            <p
+              id="profile-bio"
+              style="max-width: 800px; margin: 0 auto var(--spacing-lg)"
+            ></p>
 
-        <section id="experience">
-            <div class="container">
-                <h2>Professional Experience</h2>
-                <div id="experience-grid" class="card-grid">
-                    <!-- Experience rendered via JS -->
-                </div>
+            <div id="social-links" class="social-links">
+              <!-- Social links rendered via JS -->
             </div>
-        </section>
+          </div>
+        </div>
+      </section>
 
-        <section id="education">
-            <div class="container">
-                <h2>Education</h2>
-                <div id="education-grid" class="card-grid">
-                    <!-- Education rendered via JS -->
-                </div>
+      <section id="experience">
+        <div class="container">
+          <h2>Professional Experience</h2>
+          <div id="experience-grid" class="card-grid">
+            <!-- Experience rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <section id="education">
+        <div class="container">
+          <h2>Education</h2>
+          <div id="education-grid" class="card-grid">
+            <!-- Education rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <section id="publications">
+        <div class="container">
+          <h2>Recent Publications / Posters</h2>
+          <div id="publications-grid" class="card-grid">
+            <!-- Publications rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <section id="activities">
+        <div class="container">
+          <h2>Scientific Activities</h2>
+          <div id="activities-grid" class="card-grid">
+            <!-- Activities rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <section id="skills">
+        <div class="container">
+          <h2>Technical Expertise</h2>
+
+          <div class="card-grid">
+            <div class="card">
+              <h3>Languages & Packages</h3>
+              <ul id="skills-languages" class="skills-list">
+                <!-- Skills rendered via JS -->
+              </ul>
             </div>
-        </section>
-
-        <section id="publications">
-            <div class="container">
-                <h2>Recent Publications / Posters</h2>
-                <div id="publications-grid" class="card-grid">
-                    <!-- Publications rendered via JS -->
-                </div>
+            <div class="card">
+              <h3>ML Tools</h3>
+              <ul id="skills-ml" class="skills-list">
+                <!-- ML Skills rendered via JS -->
+              </ul>
             </div>
-        </section>
+          </div>
 
-        <section id="activities">
-            <div class="container">
-                <h2>Scientific Activities</h2>
-                <div id="activities-grid" class="card-grid">
-                    <!-- Activities rendered via JS -->
-                </div>
+          <br />
+
+          <div class="card-grid">
+            <div class="card">
+              <h3>Numerical Techniques</h3>
+              <ul id="skills-numerical">
+                <!-- Numerical skills rendered via JS -->
+              </ul>
             </div>
-        </section>
-
-        <section id="skills">
-            <div class="container">
-                <h2>Technical Expertise</h2>
-
-                <div class="card-grid">
-                    <div class="card">
-                        <h3>Languages & Packages</h3>
-                        <ul id="skills-languages" class="skills-list">
-                            <!-- Skills rendered via JS -->
-                        </ul>
-                    </div>
-                    <div class="card">
-                        <h3>ML Tools</h3>
-                        <ul id="skills-ml" class="skills-list">
-                            <!-- ML Skills rendered via JS -->
-                        </ul>
-                    </div>
-                </div>
-
-                <br>
-
-                <div class="card-grid">
-                    <div class="card">
-                        <h3>Numerical Techniques</h3>
-                        <ul id="skills-numerical">
-                            <!-- Numerical skills rendered via JS -->
-                        </ul>
-                    </div>
-                    <div class="card">
-                        <h3>Cloud & Tools</h3>
-                        <ul id="skills-cloud">
-                            <!-- Cloud skills rendered via JS -->
-                        </ul>
-                    </div>
-                </div>
+            <div class="card">
+              <h3>Cloud & Tools</h3>
+              <ul id="skills-cloud">
+                <!-- Cloud skills rendered via JS -->
+              </ul>
             </div>
-        </section>
+          </div>
+        </div>
+      </section>
 
-        <section id="certificates">
-            <div class="container">
-                <h2>Certifications & Badges</h2>
-                <div id="certificates-grid" class="certificate-grid">
-                    <!-- Certificates rendered via JS -->
-                </div>
-            </div>
-        </section>
+      <section id="certificates">
+        <div class="container">
+          <h2>Certifications & Badges</h2>
+          <div id="certificates-grid" class="certificate-grid">
+            <!-- Certificates rendered via JS -->
+          </div>
+        </div>
+      </section>
 
-        <section id="teaching">
-            <div class="container">
-                <h2>Teaching & Outreach</h2>
-                <div id="teaching-grid" class="card-grid">
-                    <!-- Teaching rendered via JS -->
-                </div>
-            </div>
-        </section>
+      <section id="teaching">
+        <div class="container">
+          <h2>Teaching & Outreach</h2>
+          <div id="teaching-grid" class="card-grid">
+            <!-- Teaching rendered via JS -->
+          </div>
+        </div>
+      </section>
 
-        <section id="projects">
-            <div class="container">
-                <h2>GitHub Projects</h2>
-                <div id="projects-grid" class="masonry-grid">
-                    <!-- Projects rendered via JS -->
-                </div>
-            </div>
-        </section>
+      <section id="projects">
+        <div class="container">
+          <h2>GitHub Projects</h2>
+          <div id="projects-grid" class="masonry-grid">
+            <!-- Projects rendered via JS -->
+          </div>
+        </div>
+      </section>
 
-        <section id="contact">
-            <div class="container">
-                <h2>Contact</h2>
-                <p>Interested in collaboration? Feel free to reach out.</p>
-                <a href="mailto:mukeshkhanore@gmail.com" class="btn">Get in Touch</a>
-            </div>
-        </section>
+      <section id="contact">
+        <div class="container">
+          <h2>Contact</h2>
+          <p>Interested in collaboration? Feel free to reach out.</p>
+          <a href="mailto:mukeshkhanore@gmail.com" class="btn">Get in Touch</a>
+        </div>
+      </section>
     </main>
 
     <footer>
-        <div class="container">
-            <p>&copy; 2025 Mukesh Khanore. Built with Atomic Intelligence.</p>
-        </div>
+      <div class="container">
+        <p>&copy; 2025 Mukesh Khanore. Built with Atomic Intelligence.</p>
+      </div>
     </footer>
 
     <script src="Assets/data.js"></script>
     <script src="Assets/script.js"></script>
-</body>
-
+  </body>
 </html>
