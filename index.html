@@ -109,16 +109,20 @@
       });
 
       // Check if consent was already given (returning visitor)
-      window.addEventListener("UC_UI_INITIALIZED", function () {
-        if (
-          typeof UC_UI !== "undefined" &&
-          UC_UI.areAllConsentsAccepted &&
-          UC_UI.areAllConsentsAccepted()
-        ) {
-          gtag("consent", "update", {
-            analytics_storage: "granted",
-          });
-          loadGoogleAnalytics();
+      window.addEventListener("UC_UI_INITIALIZED", function (event) {
+        if (typeof UC_UI !== "undefined" && UC_UI.getServicesBaseInfo) {
+          const services = UC_UI.getServicesBaseInfo();
+          const gaService = services.find(
+            (s) =>
+              s.name.toLowerCase().includes("google analytics") ||
+              s.name.toLowerCase().includes("ga4"),
+          );
+          if (gaService && gaService.consent && gaService.consent.status) {
+            gtag("consent", "update", {
+              analytics_storage: "granted",
+            });
+            loadGoogleAnalytics();
+          }
         }
       });
     </script>
@@ -138,10 +142,10 @@
             <li><a href="#education">Education</a></li>
             <li><a href="#publications">Publications</a></li>
             <li><a href="#activities">Activities</a></li>
-            <li><a href="#skills">Skills</a></li>
             <li><a href="#certificates">Certificates</a></li>
-            <li><a href="#teaching">Teaching</a></li>
             <li><a href="#projects">Projects</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#teaching">Teaching</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
           <button
@@ -221,49 +225,30 @@
         </div>
       </section>
 
-      <section id="skills">
+      <section id="certificates">
         <div class="container">
-          <h2>Technical Expertise</h2>
-
-          <div class="card-grid">
-            <div class="card">
-              <h3>Languages & Packages</h3>
-              <ul id="skills-languages" class="skills-list">
-                <!-- Skills rendered via JS -->
-              </ul>
-            </div>
-            <div class="card">
-              <h3>ML Tools</h3>
-              <ul id="skills-ml" class="skills-list">
-                <!-- ML Skills rendered via JS -->
-              </ul>
-            </div>
-          </div>
-
-          <br />
-
-          <div class="card-grid">
-            <div class="card">
-              <h3>Numerical Techniques</h3>
-              <ul id="skills-numerical">
-                <!-- Numerical skills rendered via JS -->
-              </ul>
-            </div>
-            <div class="card">
-              <h3>Cloud & Tools</h3>
-              <ul id="skills-cloud">
-                <!-- Cloud skills rendered via JS -->
-              </ul>
-            </div>
+          <h2>Certifications & Badges</h2>
+          <div id="certificates-grid" class="card-grid">
+            <!-- Certificates rendered via JS -->
           </div>
         </div>
       </section>
 
-      <section id="certificates">
+      <section id="projects">
         <div class="container">
-          <h2>Certifications & Badges</h2>
-          <div id="certificates-grid" class="certificate-grid">
-            <!-- Certificates rendered via JS -->
+          <h2>GitHub Projects</h2>
+          <div id="projects-grid" class="card-grid">
+            <!-- Projects rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <section id="skills">
+        <div class="container">
+          <h2>Technical Expertise</h2>
+
+          <div id="skills-grid" class="card-grid">
+            <!-- Skills rendered via JS -->
           </div>
         </div>
       </section>
@@ -273,15 +258,6 @@
           <h2>Teaching & Outreach</h2>
           <div id="teaching-grid" class="card-grid">
             <!-- Teaching rendered via JS -->
-          </div>
-        </div>
-      </section>
-
-      <section id="projects">
-        <div class="container">
-          <h2>GitHub Projects</h2>
-          <div id="projects-grid" class="masonry-grid">
-            <!-- Projects rendered via JS -->
           </div>
         </div>
       </section>

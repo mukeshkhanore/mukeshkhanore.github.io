@@ -9,7 +9,8 @@ const portfolioData = {
             { "name": "LinkedIn", "icon": "fab fa-linkedin", "url": "https://www.linkedin.com/in/mukesh-prakash-k-32739419/" },
             { "name": "GitHub", "icon": "fab fa-github", "url": "https://github.com/mukeshkhanore" },
             { "name": "ResearchGate", "icon": "fab fa-researchgate", "url": "https://www.researchgate.net/profile/Mukeshkumar-Khanore" },
-            { "name": "ORCID", "icon": "fab fa-orcid", "url": "https://orcid.org/0009-0008-1487-3562" }
+            { "name": "ORCID", "icon": "fab fa-orcid", "url": "https://orcid.org/0009-0008-1487-3562" },
+            { "name": "Google Scholar", "icon": "fas fa-graduation-cap", "url": "https://scholar.google.com/citations?user=yfNstRMAAAAJ&hl=en" }
         ]
     },
     "education": [
@@ -75,6 +76,13 @@ const portfolioData = {
         }
     ],
     "projects": [
+        {
+            "name": "PDF to BibTeX",
+            "url": "https://github.com/mukeshkhanore/pdf-to-bibtex",
+            "meta": "Automation Tool",
+            "description": "A Python tool to extract DOIs from PDF files and generate BibTeX citations automatically.",
+            "tags": ["Python", "LaTeX", "BibTeX"]
+        },
         {
             "name": "Descriptors Visualization",
             "url": "https://github.com/mukeshkhanore/descriptors_visualization",

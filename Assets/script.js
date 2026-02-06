@@ -243,7 +243,6 @@ function renderEducation(education) {
 function renderProjects(projects) {
     const container = document.getElementById('projects-grid');
     container.innerHTML = projects.map(project => `
-        <div class="masonry-item">
             <a href="${project.url}" target="_blank" rel="noopener noreferrer" class="card">
                 <h3>${escapeHtml(project.name)}</h3>
                 <div class="meta">${escapeHtml(project.meta)}</div>
@@ -253,7 +252,6 @@ function renderProjects(projects) {
                     ${project.tags.map(tag => `<span class="skill-tag" style="font-size: 0.8rem;">${escapeHtml(tag)}</span>`).join('')}
                 </div>` : ''}
             </a>
-        </div>
     `).join('');
 }
 
@@ -295,22 +293,35 @@ function renderActivities(activities) {
 }
 
 function renderSkills(skills) {
-    document.getElementById('skills-languages').innerHTML = skills.languages.map(skill => `<li class="skill-tag">${escapeHtml(skill)}</li>`).join('');
+    const container = document.getElementById('skills-grid');
+    const skillCategories = [
+        { title: 'Languages & Packages', data: skills.languages, type: 'tags' },
+        { title: 'ML Tools', data: skills.ml_tools, type: 'tags' },
+        { title: 'Numerical Techniques', data: skills.numerical, type: 'list' },
+        { title: 'Cloud & Tools', data: skills.cloud, type: 'list' }
+    ];
 
-    document.getElementById('skills-ml').innerHTML = skills.ml_tools.map(skill => `<li class="skill-tag">${escapeHtml(skill)}</li>`).join('');
-
-    document.getElementById('skills-numerical').innerHTML = skills.numerical.map(item => `<li>${escapeHtml(item)}</li>`).join('');
-
-    document.getElementById('skills-cloud').innerHTML = skills.cloud.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+    container.innerHTML = skillCategories.map(cat => `
+        <div class="card">
+            <h3>${escapeHtml(cat.title)}</h3>
+            <ul class="${cat.type === 'tags' ? 'skills-list' : ''}">
+                ${cat.data.map(item =>
+                    cat.type === 'tags'
+                        ? `<li class="skill-tag">${escapeHtml(item)}</li>`
+                        : `<li>${escapeHtml(item)}</li>`
+                ).join('')}
+            </ul>
+        </div>
+    `).join('');
 }
 
 function renderCertificates(certificates) {
     const container = document.getElementById('certificates-grid');
     container.innerHTML = certificates.map(cert => `
-        <a href="${cert.url}" target="_blank" rel="noopener noreferrer" class="certificate-card">
-            <i class="${cert.icon} badge-icon"></i>
-            <h3>${escapeHtml(cert.title)}</h3>
-            <p>${escapeHtml(cert.issuer)}</p>
+        <a href="${cert.url}" target="_blank" rel="noopener noreferrer" class="card" style="display: block; text-decoration: none;">
+            <h3>${escapeHtml(cert.title)} <i class="${cert.icon}" style="font-size: 0.8em; margin-left: 5px;"></i></h3>
+            <div class="meta">${escapeHtml(cert.issuer)}</div>
+            <p>View Certificate <i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i></p>
         </a>
     `).join('');
 }
