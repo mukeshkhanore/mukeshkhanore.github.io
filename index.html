@@ -39,7 +39,27 @@
       referrerpolicy="no-referrer"
     />
 
-    <!-- Google Analytics 4 (Consent-Gated via Usercentrics) -->
+    <!-- Google Analytics 4 (TESTING MODE - Direct Load) -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y8665QV2J8"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-Y8665QV2J8', {
+        anonymize_ip: true,
+        cookie_flags: 'SameSite=None;Secure'
+      });
+      console.log('[GA] Google Analytics loaded in TESTING mode (no consent required)');
+    </script>
+
+    <!-- 
+    ====================================================================
+    ORIGINAL CONSENT-GATED VERSION (commented out for testing)
+    To restore consent-gated GA, uncomment this section and remove the 
+    "TESTING MODE" section above.
+    ====================================================================
+    
     <script>
       // GA4 Measurement ID
       const GA_MEASUREMENT_ID = "G-Y8665QV2J8";
@@ -54,7 +74,7 @@
       gtag("consent", "default", {
         analytics_storage: "denied",
         ad_storage: "denied",
-        wait_for_update: 500, // Wait for consent manager
+        wait_for_update: 500,
       });
 
       // Function to load GA script dynamically
@@ -90,7 +110,6 @@
           });
           console.log("[GA] Analytics consent denied");
         } else if (event.detail && event.detail.type === "SAVE") {
-          // Check specific service consent via Usercentrics API
           if (typeof UC_UI !== "undefined" && UC_UI.getServicesBaseInfo) {
             const services = UC_UI.getServicesBaseInfo();
             const gaService = services.find(
@@ -126,6 +145,7 @@
         }
       });
     </script>
+    -->
   </head>
 
   <body>
