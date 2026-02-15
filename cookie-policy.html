@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Security: Content Security Policy -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://consent-eu.cookiefirst.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://www.google-analytics.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://consent-eu.cookiefirst.com;"
+    />
+    <!-- Security: Upgrade insecure requests to HTTPS -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="upgrade-insecure-requests"
+    />
+    <!-- CookieFirst Consent Management Platform -->
+    <script src="https://consent-eu.cookiefirst.com/sites/mukeshkhanore.github.io-8c8a1728-7075-4f89-a2cc-051c120599b0/consent.js"></script>
+
+    <title>Cookie Policy - Mukesh Khanore</title>
+    <link rel="stylesheet" href="Assets/style.css" />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- FontAwesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+
+  <body>
+    <!-- Global Background Animation -->
+    <canvas id="bg-canvas"></canvas>
+
+    <header>
+      <div class="container">
+        <nav>
+          <div class="logo">MK.</div>
+          <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#about">About</a></li>
+            <li><a href="index.html#contact">Contact</a></li>
+          </ul>
+          <button
+            id="hamburger"
+            class="hamburger"
+            aria-label="Toggle Navigation"
+          >
+            <i class="fas fa-bars"></i>
+          </button>
+          <button id="theme-toggle" class="theme-toggle" title="Switch Theme">
+            <i class="fas fa-moon"></i>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section style="padding: 80px 0;">
+        <div class="container">
+          <div class="hero-card" style="max-width: 900px; margin: 0 auto;">
+            <h1 style="margin-bottom: 2rem;">Cookie Policy</h1>
+            
+            <!-- CookieFirst Policy Page Container -->
+            <div id="cookiefirst-policy-page"></div>
+            
+            <div style="margin: 2rem 0; padding: 1rem; background: var(--card-bg); border-radius: 8px;">
+              <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">
+                This cookie policy has been created and updated by 
+                <a href="https://cookiefirst.com/cookie-scanner/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-primary);">Cookie Scanner</a>.
+              </p>
+            </div>
+
+            <!-- CookieFirst Cookies Table -->
+            <div id="cookiefirst-cookies-table" style="margin: 2rem 0;"></div>
+            
+            <div style="margin: 2rem 0; padding: 1rem; background: var(--card-bg); border-radius: 8px;">
+              <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">
+                This cookie table has been created and updated by the 
+                <a href="https://cookiefirst.com/cookie-policy-generator/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-primary);">Cookie Policy Generator</a>.
+              </p>
+            </div>
+
+            <h2 style="margin-top: 3rem;">Consent to the use of cookies</h2>
+            <p>
+              For our website to function properly we use cookies. To obtain your valid consent for the use and storage of cookies in the browser you use to access our website and to properly document this we use a consent management platform: CookieFirst. This technology is provided by Digital Data Solutions BV, Plantage Middenlaan 42a, 1018 DH, Amsterdam, The Netherlands. Website: 
+              <a href='https://cookiefirst.com' title='Cookiefirst page' target="_blank" rel="noopener noreferrer" style="color: var(--accent-primary);">https://cookiefirst.com</a> referred to as CookieFirst.
+            </p>
+            <p>
+              When you access our website, a connection is established with CookieFirst's server to give us the possibility to obtain valid consent from you to the use of certain cookies. CookieFirst then stores a cookie in your browser in order to be able to activate only those cookies to which you have consented and to properly document this. The data processed is stored until the predefined storage period expires or you request to delete the data. Certain mandatory legal storage periods may apply notwithstanding the aforementioned.
+            </p>
+            <p>
+              CookieFirst is used to obtain the legally required consent for the use of cookies. The legal basis for this is article 6(1)(c) of the General Data Protection Regulation (GDPR).
+            </p>
+
+            <h2 style="margin-top: 2rem;">Data processing agreement</h2>
+            <p>
+              We have concluded a data processing agreement with CookieFirst. This is a contract required by data protection law, which ensures that data of our website visitors is only processed in accordance with our instructions and in compliance with the GDPR.
+            </p>
+
+            <h2 style="margin-top: 2rem;">Server log files</h2>
+            <p>
+              Our website and CookieFirst automatically collect and store information in so-called server log files, which your browser automatically transmits to us. The following data is collected:
+            </p>
+            <ul style="list-style-type: disc; padding-left: 2rem; margin: 1rem 0;">
+              <li>Your consent status or the withdrawal of consent</li>
+              <li>Your anonymised IP address</li>
+              <li>Information about your Browser</li>
+              <li>Information about your Device</li>
+              <li>The date and time you have visited our website</li>
+              <li>The webpage url where you saved or updated your consent preferences</li>
+              <li>The approximate location of the user that saved their consent preference</li>
+              <li>A universally unique identifier (UUID) of the website visitor that clicked the cookie banner</li>
+            </ul>
+
+            <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-primary);">
+              <p style="text-align: center;">
+                <a href="index.html" class="btn">Back to Home</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <p>&copy; 2025 Mukesh Khanore. Built with Atomic Intelligence.</p>
+      </div>
+    </footer>
+
+    <script src="Assets/script.js"></script>
+  </body>
+</html>
