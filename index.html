@@ -34,83 +34,14 @@
       referrerpolicy="no-referrer"
     />
 
-    <!-- Google Analytics 4 with CookieFirst Consent Mode -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y8665QV2J8"></script>
     <script>
-      // GA4 Measurement ID
-      const GA_MEASUREMENT_ID = "G-Y8665QV2J8";
-
-      // Initialize dataLayer
       window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-      // Set default consent to denied (GDPR-compliant)
-      gtag("consent", "default", {
-        analytics_storage: "denied",
-        ad_storage: "denied",
-        wait_for_update: 500,
-      });
-
-      // Function to load GA script dynamically
-      function loadGoogleAnalytics() {
-        if (document.querySelector('script[src*="googletagmanager.com/gtag"]')) {
-          console.log("[GA] Google Analytics script already loaded");
-          return;
-        }
-
-        const script = document.createElement("script");
-        script.async = true;
-        script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
-        document.head.appendChild(script);
-
-        script.onload = function () {
-          gtag("js", new Date());
-          gtag("config", GA_MEASUREMENT_ID, {
-            anonymize_ip: true,
-            cookie_flags: "SameSite=None;Secure",
-          });
-          console.log("[GA] Google Analytics loaded with consent");
-        };
-      }
-
-      // Listen for CookieFirst initialization
-      window.addEventListener("cf_init", function () {
-        console.log("[CookieFirst] Banner initialized");
-        
-        // Check if consent was already given (returning visitor)
-        if (typeof CookieFirst !== "undefined" && CookieFirst.consent) {
-          if (CookieFirst.consent.statistics) {
-            console.log("[GA] Consent already granted (returning visitor)");
-            gtag("consent", "update", {
-              analytics_storage: "granted",
-            });
-            loadGoogleAnalytics();
-          } else {
-            console.log("[GA] Consent not granted (statistics disabled)");
-          }
-        }
-      });
-
-      // Listen for consent changes
-      window.addEventListener("cf_consent", function () {
-        console.log("[CookieFirst] Consent event triggered");
-        
-        if (typeof CookieFirst !== "undefined" && CookieFirst.consent) {
-          if (CookieFirst.consent.statistics) {
-            console.log("[GA] Consent granted, loading Google Analytics");
-            gtag("consent", "update", {
-              analytics_storage: "granted",
-            });
-            loadGoogleAnalytics();
-          } else {
-            console.log("[GA] Consent denied, Google Analytics not loaded");
-            gtag("consent", "update", {
-              analytics_storage: "denied",
-            });
-          }
-        }
-      });
+      gtag('config', 'G-Y8665QV2J8');
     </script>
 
   </head>
