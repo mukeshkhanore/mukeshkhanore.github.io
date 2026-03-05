@@ -211,6 +211,12 @@ const portfolioData = {
             "url": "https://learn.nvidia.com/certificates?id=Ppjc0iNlRJ2yiJdoVhOKgw"
         },
         {
+            "title": "Fundamentals of Accelerated Computing with Modern CUDA C++",
+            "issuer": "NVIDIA Deep Learning Institute",
+            "icon": "fas fa-microchip",
+            "url": "https://learn.nvidia.com/certificates?id=HuN3OyBJTzuQB_SFkWH_WA"
+        },
+        {
             "title": "Google Certificate",
             "issuer": "View Credential",
             "icon": "fab fa-google",
