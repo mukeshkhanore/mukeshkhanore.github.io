@@ -3,19 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Security: Content Security Policy -->
+    <!-- Security: Content Security Policy (merged; upgrade-insecure-requests included) -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://consent-eu.cookiefirst.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://www.google-analytics.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://consent-eu.cookiefirst.com;"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://consent-eu.cookiefirst.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://www.google-analytics.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://consent-eu.cookiefirst.com; upgrade-insecure-requests;"
     />
-    <!-- Security: Upgrade insecure requests to HTTPS -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="upgrade-insecure-requests"
-    />
-
 
     <title>Mukesh Khanore - Physics PhD & Data Scientist</title>
+    <meta
+      name="description"
+      content="Mukesh Khanore – Computational Physicist, PhD Researcher, and Data Scientist specializing in machine learning for atomic simulations of materials like perovskites."
+    />
+    <link rel="canonical" href="https://mukeshkhanore.github.io/" />
     <link rel="stylesheet" href="Assets/style.css" />
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -34,15 +33,19 @@
     />
 
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TEYETSEN4Z"></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-TEYETSEN4Z"
+    ></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
-      gtag('config', 'G-TEYETSEN4Z');
+      gtag("config", "G-TEYETSEN4Z");
     </script>
-
   </head>
 
   <body>
@@ -69,6 +72,7 @@
             id="hamburger"
             class="hamburger"
             aria-label="Toggle Navigation"
+            aria-expanded="false"
           >
             <i class="fas fa-bars"></i>
           </button>
@@ -86,9 +90,11 @@
             <div class="profile-photo-container">
               <img
                 id="profile-avatar"
-                src=""
-                alt="Profile"
+                src="Assets/profile_avatar.png"
+                alt="Mukesh Khanore profile photo"
                 class="profile-photo"
+                width="200"
+                height="200"
                 fetchpriority="high"
               />
             </div>
@@ -190,7 +196,13 @@
 
     <footer>
       <div class="container">
-        <p>&copy; 2025 Mukesh Khanore. Built with Atomic Intelligence. | <a href="cookie-policy.html" style="color: var(--accent-primary);">Cookie Policy</a></p>
+        <p>
+          &copy; <span id="copyright-year"></span> Mukesh Khanore. Built with
+          Atomic Intelligence. |
+          <a href="cookie-policy.html" style="color: var(--accent-primary)"
+            >Cookie Policy</a
+          >
+        </p>
       </div>
     </footer>
 

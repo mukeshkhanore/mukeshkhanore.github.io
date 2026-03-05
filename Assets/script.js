@@ -46,23 +46,31 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    // Read particle colour from the currently active theme's accent colour
+    function getThemeParticleColor() {
+        return getComputedStyle(document.documentElement)
+            .getPropertyValue('--accent-color').trim() || '#00e1ff';
+    }
+
     class Particle {
         constructor() {
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height;
-            this.directionX = (Math.random() * 0.6) - 0.3; // Increased speed slightly
+            this.directionX = (Math.random() * 0.6) - 0.3;
             this.directionY = (Math.random() * 0.6) - 0.3;
-            this.size = Math.random() * 3 + 2; // Increased size: 2 to 5px
-            this.color = '#00e1ff'; // Cyan
+            this.size = Math.random() * 3 + 2; // 2–5 px
+            this.color = getThemeParticleColor();
         }
 
         // Method to draw individual particle
         draw() {
+            ctx.save();                        // #5 — prevent globalAlpha leak
+            ctx.globalAlpha = 0.4;
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
             ctx.fillStyle = this.color;
-            ctx.globalAlpha = 0.4; // Reduced opacity for readability (was 0.8)
             ctx.fill();
+            ctx.restore();
         }
 
         // Check particle position, check mouse position, move the particle, draw the particle
@@ -84,18 +92,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Create particle array
+    // Create particle array — capped at 120 to avoid O(n²) connect() cost
     function init() {
         particlesArray = [];
-        let numberOfParticles = (canvas.height * canvas.width) / 10000; // Reduced density for performance (was 6000)
+        let numberOfParticles = Math.min(
+            Math.floor((canvas.height * canvas.width) / 10000),
+            120
+        );
         for (let i = 0; i < numberOfParticles; i++) {
             particlesArray.push(new Particle());
         }
     }
 
-    // Animation Loop
+    // Animation Loop — paused when tab is not visible (#16)
+    let animFrameId;
     function animate() {
-        requestAnimationFrame(animate);
+        animFrameId = requestAnimationFrame(animate);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         for (let i = 0; i < particlesArray.length; i++) {
@@ -103,6 +115,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         connect();
     }
+
+    // Page Visibility API: pause animation to save battery when tab is hidden
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            cancelAnimationFrame(animFrameId);
+        } else {
+            animate();
+        }
+    });
 
     // Check if particles are close enough to draw line
     function connect() {
@@ -195,7 +216,17 @@ document.addEventListener('DOMContentLoaded', () => {
             themeIcon.className = 'fas fa-adjust';
             themeToggleBtn.title = "Switch to Atomic Mode";
         }
+
+        // Re-colour existing particles to match new theme (#4)
+        if (particlesArray) {
+            const color = getThemeParticleColor();
+            particlesArray.forEach(p => { p.color = color; });
+        }
     }
+
+    // Set copyright year dynamically (#13)
+    const yearEl = document.getElementById('copyright-year');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
 
     // Load Content from Data Object (Synchronous, Security: validate before rendering)
     if (typeof portfolioData !== 'undefined' && validatePortfolioData(portfolioData)) {
@@ -248,8 +279,8 @@ function renderProjects(projects) {
                 <div class="meta">${escapeHtml(project.meta)}</div>
                 <p>${escapeHtml(project.description)}</p>
                 ${project.tags.length ? `
-                <div class="skills-list" style="margin-top: 1rem;">
-                    ${project.tags.map(tag => `<span class="skill-tag" style="font-size: 0.8rem;">${escapeHtml(tag)}</span>`).join('')}
+                <div class="skills-list card-tag-row">
+                    ${project.tags.map(tag => `<span class="skill-tag skill-tag--sm">${escapeHtml(tag)}</span>`).join('')}
                 </div>` : ''}
             </a>
     `).join('');
@@ -272,8 +303,8 @@ function renderExperience(experience) {
 function renderPublications(publications) {
     const container = document.getElementById('publications-grid');
     container.innerHTML = publications.map(pub => `
-        <a href="${pub.url}" target="_blank" rel="noopener noreferrer" class="card" style="display: block; text-decoration: none;">
-            <h3>${escapeHtml(pub.title)} <i class="fas fa-external-link-alt" style="font-size: 0.8em; margin-left: 5px;"></i></h3>
+        <a href="${pub.url}" target="_blank" rel="noopener noreferrer" class="card card--link">
+            <h3>${escapeHtml(pub.title)} <i class="fas fa-external-link-alt card-ext-icon"></i></h3>
             <div class="meta">${escapeHtml(pub.meta)}</div>
             <p>${escapeHtml(pub.authors)}</p>
             ${pub.description ? `<p>${escapeHtml(pub.description)}</p>` : ''}
@@ -318,13 +349,15 @@ function renderSkills(skills) {
 function renderCertificates(certificates) {
     const container = document.getElementById('certificates-grid');
     container.innerHTML = certificates.map(cert => `
-        <a href="${cert.url}" target="_blank" rel="noopener noreferrer" class="card" style="display: block; text-decoration: none;">
-            <h3>${escapeHtml(cert.title)} <i class="${cert.icon}" style="font-size: 0.8em; margin-left: 5px;"></i></h3>
+        <a href="${cert.url}" target="_blank" rel="noopener noreferrer" class="card card--link">
+            <h3><i class="${escapeHtml(cert.icon)} card-icon"></i>${escapeHtml(cert.title)}</h3>
             <div class="meta">${escapeHtml(cert.issuer)}</div>
-            <p>View Certificate <i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i></p>
+            <p>${escapeHtml(cert.description)}</p>
+            <p class="card-view-link">View Certificate <i class="fas fa-external-link-alt card-ext-icon"></i></p>
         </a>
     `).join('');
 }
+
 
 function renderTeaching(teaching) {
     const container = document.getElementById('teaching-grid');

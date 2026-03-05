@@ -205,20 +205,23 @@ const portfolioData = {
     },
     "certificates": [
         {
-            "title": "NVIDIA Certificate",
+            "title": "Fundamentals of Deep Learning",
             "issuer": "NVIDIA Deep Learning Institute",
+            "description": "Covered practical deep learning techniques using modern neural network frameworks for real-world AI applications.",
             "icon": "fas fa-microchip",
             "url": "https://learn.nvidia.com/certificates?id=Ppjc0iNlRJ2yiJdoVhOKgw"
         },
         {
             "title": "Fundamentals of Accelerated Computing with Modern CUDA C++",
             "issuer": "NVIDIA Deep Learning Institute",
+            "description": "Mastered GPU-accelerated computing using CUDA C++ for high-performance scientific and parallel programming.",
             "icon": "fas fa-microchip",
             "url": "https://learn.nvidia.com/certificates?id=HuN3OyBJTzuQB_SFkWH_WA"
         },
         {
-            "title": "Google Certificate",
-            "issuer": "View Credential",
+            "title": "Google Data Analytics Certificate",
+            "issuer": "Google",
+            "description": "Comprehensive training in data analysis, visualization, and reporting using industry-standard tools and workflows.",
             "icon": "fab fa-google",
             "url": "https://www.credential.net/d3522394-8bfd-455b-8ec6-c5f49424223a#acc.VXtzC23o"
         }
