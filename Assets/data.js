@@ -142,23 +142,16 @@ const portfolioData = {
     ],
     "publications": [
         {
-            "title": "Machine-learning interatomic potentials for perovskite oxides: Accuracy, transferability, and physical constraints",
-            "meta": "Phys. Scr. (2025) — IOPscience",
-            "authors": "Khanore Mukesh et al.",
-            "description": "Developed and benchmarked machine-learning interatomic potentials for perovskite oxides, assessing accuracy and transferability against DFT references while enforcing physical constraints.",
-            "url": "https://iopscience.iop.org/article/10.1088/1402-4896/ae59c0/meta"
-        },
-        {
             "title": "Transition metals: Matching microscopic quantum dynamics with macroscopic magnetic order",
             "meta": "AIP Advances 15, 3 (2025)",
             "authors": "Janiš Václav and Khanore Mukesh",
             "url": "https://doi.org/10.1063/9.0000859"
         },
         {
-            "title": "Quantum dynamics in symmetry-breaking states of correlated electrons",
-            "meta": "arXiv:2410.06831 (2024)",
+            "title": "Quantum dynamics in symmetry-breaking states of correlated electrons: Antiferromagnetic phase",
+            "meta": "Phys. Scr. 100 (2025) — IOPscience",
             "authors": "Janiš Václav, Khanore Mukesh, and Klíč Antonín",
-            "url": "https://arxiv.org/abs/2410.06831"
+            "url": "https://iopscience.iop.org/article/10.1088/1402-4896/ae59c0/meta"
         },
         {
             "title": "The Quantum Vortex States in Extended Bose-Hubbard Model",
@@ -182,12 +175,11 @@ const portfolioData = {
             "url": "https://doi.org/10.1063/1.4872558"
         },
         {
-            "title": "Machine Learning Interatomic Potentials for Perovskites",
+            "title": "Deep learning frameworks for exploration of energy landscapes of perovskites",
             "meta": "Conference Presentation · ResearchGate (2025)",
             "authors": "Khanore Mukesh",
-            "description": "Conference presentation on the development and application of machine-learning interatomic potentials for simulating perovskite materials.",
-            "type": "presentation",
-            "url": "https://doi.org/10.13140/RG.2.2.20920.92165"
+            "description": "Conference presentation on deep learning frameworks developed for exploring the energy landscapes of perovskite materials.",
+            "url": "https://www.researchgate.net/publication/392360547"
         }
     ],
     "activities": [
