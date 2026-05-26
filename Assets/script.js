@@ -302,14 +302,21 @@ function renderExperience(experience) {
 
 function renderPublications(publications) {
     const container = document.getElementById('publications-grid');
-    container.innerHTML = publications.map(pub => `
-        <a href="${pub.url}" target="_blank" rel="noopener noreferrer" class="card card--link">
-            <h3>${escapeHtml(pub.title)} <i class="fas fa-external-link-alt card-ext-icon"></i></h3>
+    container.innerHTML = publications.map(pub => {
+        const isPresentation = pub.type === 'presentation';
+        const linkIcon = isPresentation ? 'fas fa-file-powerpoint' : 'fas fa-external-link-alt';
+        const badge = isPresentation
+            ? `<span class="pub-badge pub-badge--presentation"><i class="fas fa-chalkboard-teacher"></i> Presentation</span>`
+            : `<span class="pub-badge pub-badge--journal"><i class="fas fa-book-open"></i> Journal</span>`;
+        return `
+        <a href="${pub.url}" target="_blank" rel="noopener noreferrer" class="card card--link${isPresentation ? ' card--presentation' : ''}">
+            <div class="pub-badge-row">${badge}</div>
+            <h3>${escapeHtml(pub.title)} <i class="${linkIcon} card-ext-icon"></i></h3>
             <div class="meta">${escapeHtml(pub.meta)}</div>
             <p>${escapeHtml(pub.authors)}</p>
             ${pub.description ? `<p>${escapeHtml(pub.description)}</p>` : ''}
-        </a>
-    `).join('');
+        </a>`;
+    }).join('');
 }
 
 function renderActivities(activities) {

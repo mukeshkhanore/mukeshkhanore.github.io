@@ -142,6 +142,13 @@ const portfolioData = {
     ],
     "publications": [
         {
+            "title": "Machine-learning interatomic potentials for perovskite oxides: Accuracy, transferability, and physical constraints",
+            "meta": "Phys. Scr. (2025) — IOPscience",
+            "authors": "Khanore Mukesh et al.",
+            "description": "Developed and benchmarked machine-learning interatomic potentials for perovskite oxides, assessing accuracy and transferability against DFT references while enforcing physical constraints.",
+            "url": "https://iopscience.iop.org/article/10.1088/1402-4896/ae59c0/meta"
+        },
+        {
             "title": "Transition metals: Matching microscopic quantum dynamics with macroscopic magnetic order",
             "meta": "AIP Advances 15, 3 (2025)",
             "authors": "Janiš Václav and Khanore Mukesh",
@@ -173,6 +180,14 @@ const portfolioData = {
             "authors": "Mukesh Khanore and Bishwajyoti Dey",
             "description": "Studied the Bose-Hubbard model with attractive interactions in the presence of an inhomogeneous lattice potential.",
             "url": "https://doi.org/10.1063/1.4872558"
+        },
+        {
+            "title": "Machine Learning Interatomic Potentials for Perovskites",
+            "meta": "Conference Presentation · ResearchGate (2025)",
+            "authors": "Khanore Mukesh",
+            "description": "Conference presentation on the development and application of machine-learning interatomic potentials for simulating perovskite materials.",
+            "type": "presentation",
+            "url": "https://doi.org/10.13140/RG.2.2.20920.92165"
         }
     ],
     "activities": [
