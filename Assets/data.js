@@ -176,10 +176,10 @@ const portfolioData = {
         },
         {
             "title": "Deep learning frameworks for exploration of energy landscapes of perovskites",
-            "meta": "Conference Presentation · ResearchGate (2025)",
+            "meta": "Conference Presentation · ResearchGate (2026)",
             "authors": "Khanore Mukesh",
-            "description": "Conference presentation on deep learning frameworks developed for exploring the energy landscapes of perovskite materials.",
-            "url": "https://www.researchgate.net/publication/392360547"
+            "description": "Conference: XXVI Czech–Polish seminar Structural and ferroelectrics phase transitions.",
+            "url": "https://doi.org/10.13140/RG.2.2.20920.92165"
         }
     ],
     "activities": [
