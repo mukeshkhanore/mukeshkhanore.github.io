@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /cookie-policy.html
+
+Sitemap: https://mukeshkhanore.github.io/sitemap.xml

@@ -1,66 +1,116 @@
 :root {
-  /* Theme: Deep Academic Navy (Premium Dark) */
-  --primary-color: #0b1121; /* Deep Navy */
-  --secondary-color: #1e293b; /* Slate 800 */
-  --accent-color: #06b6d4; /* Cyan 500 */
-  --accent-gradient: linear-gradient(
-    135deg,
-    #06b6d4 0%,
-    #3b82f6 100%
-  ); /* Cyan to Blue */
+  /* Theme: Modern Professional (dark) — midnight ground, single teal accent */
+  --primary-color: #2c3e50; /* Midnight */
+  --secondary-color: #34495e; /* Asphalt */
+  --accent-color: #52d1b8; /* Teal, lifted to clear AA on midnight */
+  --accent-rgb: 82, 209, 184;
+  --accent-hover: #7fe0cc;
 
-  --text-primary: #f1f5f9; /* Slate 100 */
-  --text-secondary: #94a3b8; /* Slate 400 */
-  --border-color: #334155; /* Slate 700 */
+  --text-primary: #ecf0f1; /* Clouds */
+  --text-secondary: #bdc3c7; /* Silver */
+  --border-color: #566d85; /* 2.05:1 — cards sit only 1.18:1 off the page,
+                              so the hairline has to carry the boundary */
 
-  --card-bg: rgba(30, 41, 59, 0.7); /* Slate 800 with opacity */
-  --card-hover-shadow: 0 20px 40px -15px rgba(6, 182, 212, 0.2);
+  --card-bg: rgba(52, 73, 94, 0.85);
+  --card-hover-shadow: 0 20px 40px -15px rgba(var(--accent-rgb), 0.25);
 
   /* Typography */
   --font-main:
-    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
-  --font-mono: "Fira Code", monospace;
+    "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  /*
+   * One superfamily in three cuts. Serif, sans and mono share a skeleton,
+   * widths and vertical metrics, so mixing them inside a line does not shift
+   * the baseline — which three unrelated faces did.
+   */
+  --font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono:
+    "Source Code Pro", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Spacing */
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 2rem;
-  --spacing-xl: 5rem;
+  /* Type scale. Five steps, deliberately far apart: the previous design had
+     nine sizes between 0.8 and 1.0rem, which read as inconsistency rather
+     than hierarchy. Weight and spacing carry emphasis instead. */
+  --fs-micro: 0.8125rem; /* 13px  — kind label */
+  --fs-meta: 0.9375rem; /* 15px  — rails, venues, card meta */
+  --fs-body: 1.125rem; /* 18px  — body, bullets, notes */
+  --fs-lead: 1.25rem; /* 20px  — intro paragraph, one role only */
+  --fs-title: 1.5rem; /* 24px  — entry and card titles */
+  --fs-section: clamp(1.875rem, 3.2vw, 2.375rem); /* 30–38px */
+
+  /* Three line-heights, not the seven that had accumulated. */
+  --lh-tight: 1.2;
+  --lh-snug: 1.4;
+  --lh-body: 1.65;
+
+  /* Reading measure. ~70 characters; beyond that the eye struggles to find
+     the next line's start. */
+  --measure: 70ch;
+
+  /* One geometry for the whole page. Sections differ by internal pattern —
+     rail+row, or 2-up grid — never by outer width, so every edge lines up
+     down the page. */
+  --content-width: 67.5rem; /* 1080px */
+  --rail: 12rem; /* 192px — holds "Aug 2013 – Aug 2019" at 15px mono
+     without wrapping, which the baseline alignment below depends on */
+  --surface-pad: var(--space-5); /* 24px */
+  --radius: 12px;
+
+  /* Surfaces sit only ~1.15:1 above the page, which is normal; the resting
+     shadow is what separates them, not the tone. */
+  --shadow-rest:
+    0 1px 2px rgba(0, 0, 0, 0.25), 0 6px 16px -8px rgba(0, 0, 0, 0.4);
+
+  /*
+   * Spacing scale on a 4px grid. Before this there were three tokens and
+   * nineteen loose values, six of which sat within 5px of each other — the
+   * same drift the type scale had, in the other dimension.
+   */
+  --space-1: 0.25rem; /* 4px  */
+  --space-2: 0.5rem; /* 8px  */
+  --space-3: 0.75rem; /* 12px */
+  --space-4: 1rem; /* 16px */
+  --space-5: 1.5rem; /* 24px */
+  --space-6: 2rem; /* 32px */
+  --space-7: 3rem; /* 48px */
+  --space-8: 5rem; /* 80px */
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg:
     0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
-  /* Header Background */
-  --header-bg: rgba(11, 17, 33, 0.85);
-
-  /* Text Gradient */
-  --text-gradient: linear-gradient(to right, #f8fafc, #94a3b8);
+  --header-bg: rgba(44, 62, 80, 0.9);
+  --overlay-bg: rgba(44, 62, 80, 0.97);
+  /* Veil for meta pills and card sheen. Light on a dark ground, dark on a
+     light one — a white veil is invisible on paper. */
+  --overlay-tint: rgba(255, 255, 255, 0.07);
+  /* Second mark, for presentations. This palette has no second hue, so the
+     mark steps along the same grey ramp instead of introducing one. */
+  --mark-color: #bdc3c7;
 }
 
-/* Light Theme (Clean Academic) */
+/* Light Theme: Modern Professional (monochrome) — no accent hue at all,
+   so links are distinguished by underline rather than colour. */
 [data-theme="light"] {
-  --primary-color: #f8fafc; /* Slate 50 */
-  --secondary-color: #ffffff; /* White */
-  --accent-color: #4f46e5; /* Indigo 600 */
-  --accent-gradient: linear-gradient(
-    135deg,
-    #4f46e5 0%,
-    #0ea5e9 100%
-  ); /* Indigo to Sky */
+  --primary-color: #ecf0f1; /* Clouds */
+  --secondary-color: #ffffff;
+  --accent-color: #2c3e50; /* Midnight — the ink doubles as the accent */
+  --accent-rgb: 44, 62, 80;
+  --accent-hover: #16232e;
 
-  --text-primary: #0f172a; /* Slate 900 */
-  --text-secondary: #475569; /* Slate 600 */
-  --border-color: #cbd5e1; /* Slate 300 */
+  --text-primary: #2c3e50;
+  --text-secondary: #5f6e6f; /* Asbestos darkened: #7F8C8D is 3.03:1, too
+                                light for body text */
+  --border-color: #9fa9ae; /* 2.09:1 */
 
-  --card-bg: rgba(255, 255, 255, 0.8);
-  --card-hover-shadow: 0 20px 40px -15px rgba(79, 70, 229, 0.15);
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --card-hover-shadow: 0 20px 40px -15px rgba(var(--accent-rgb), 0.18);
 
-  --header-bg: rgba(248, 250, 252, 0.9);
-  --text-gradient: linear-gradient(to right, #0f172a, #334155);
+  --header-bg: rgba(236, 240, 241, 0.9);
+  --overlay-bg: rgba(236, 240, 241, 0.97);
+  --overlay-tint: rgba(44, 62, 80, 0.07);
+  --shadow-rest:
+    0 1px 2px rgba(27, 39, 51, 0.06), 0 6px 16px -8px rgba(27, 39, 51, 0.14);
+  --mark-color: #34495e;
 }
 
 /* High Contrast Theme */
@@ -68,14 +118,19 @@
   --primary-color: #000000;
   --secondary-color: #000000;
   --accent-color: #ffff00;
-  --accent-gradient: linear-gradient(135deg, #ffff00 0%, #ffff00 100%);
+  --accent-rgb: 255, 255, 0;
+  --accent-hover: #ffff00;
+  --mark-color: #ffff00;
   --text-primary: #ffffff;
   --text-secondary: #ffffff;
   --border-color: #ffffff;
   --card-bg: #111111;
   --card-hover-shadow: 0 0 0 3px #ffff00;
   --header-bg: #000000;
-  --text-gradient: linear-gradient(to right, #ffffff, #ffffff);
+  --overlay-bg: #000000;
+  --overlay-tint: rgba(255, 255, 255, 0.12);
+  /* High contrast separates surfaces with borders, not depth. */
+  --shadow-rest: none;
 }
 
 * {
@@ -94,9 +149,8 @@ body {
   font-family: var(--font-main);
   background-color: var(--primary-color);
   color: var(--text-primary);
-  font-size: 1rem;
-  line-height: 1.8;
-  /* Improved from 1.6 for better readability */
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
   overflow-x: hidden;
 }
 
@@ -107,17 +161,16 @@ a {
 }
 
 a:hover {
-  color: #22d3ee;
-  /* Lighter cyan */
+  color: var(--accent-hover);
   text-decoration: underline;
 }
 
 /* Button Style */
 .btn {
   display: inline-block;
-  background: var(--accent-gradient);
+  background: var(--accent-color);
   color: var(--primary-color);
-  padding: 0.75rem 1.5rem;
+  padding: var(--space-3) var(--space-5);
   border-radius: 9999px;
   font-weight: 600;
   transition:
@@ -130,16 +183,16 @@ a:hover {
 
 .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 225, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
   text-decoration: none;
   color: var(--primary-color);
 }
 
 /* Layout Utilities */
 .container {
-  max-width: 1200px;
+  max-width: var(--content-width);
   margin: 0 auto;
-  padding: 0 var(--spacing-md);
+  padding: 0 var(--space-4);
 }
 
 /* Header / Navigation */
@@ -150,7 +203,7 @@ header {
   top: 0;
   z-index: 100;
   border-bottom: 1px solid var(--border-color);
-  padding: var(--spacing-md) 0;
+  padding: var(--space-4) 0;
 }
 
 nav {
@@ -161,13 +214,13 @@ nav {
 
 .logo {
   font-weight: 700;
-  font-size: 1.25rem;
+  font-size: var(--fs-title);
   color: var(--text-primary);
 }
 
 .nav-links {
   display: flex;
-  gap: var(--spacing-lg);
+  gap: var(--space-6);
   list-style: none;
 }
 
@@ -187,9 +240,9 @@ nav {
   background: none;
   border: none;
   color: var(--text-primary);
-  font-size: 1.5rem;
+  font-size: 1.5rem /* sizes the SVG, which is 1em */;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: var(--space-2);
 }
 
 /* Mobile Navigation */
@@ -197,7 +250,7 @@ nav {
   .hamburger {
     display: block;
     margin-left: auto;
-    margin-right: 1rem;
+    margin-right: var(--space-4);
   }
 
   .nav-links {
@@ -207,7 +260,7 @@ nav {
     height: 100vh;
     width: 70%;
     max-width: 300px;
-    background-color: rgba(15, 23, 42, 0.95);
+    background-color: var(--overlay-bg);
     backdrop-filter: blur(10px);
     flex-direction: column;
     justify-content: center;
@@ -222,21 +275,28 @@ nav {
   }
 
   .nav-links li {
-    margin: 1.5rem 0;
+    margin: var(--space-5) 0;
   }
 
   .nav-links a {
-    font-size: 1.2rem;
+    font-size: var(--fs-title);
   }
 }
 
 /* Hero Section */
 .hero {
-  padding: var(--spacing-xl) 0;
-  text-align: center;
+  padding: var(--space-8) 0;
   background:
-    radial-gradient(circle at top right, #1e293b 0%, transparent 40%),
-    radial-gradient(circle at bottom left, #1e293b 0%, transparent 40%);
+    radial-gradient(
+      circle at top right,
+      var(--secondary-color) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at bottom left,
+      var(--secondary-color) 0%,
+      transparent 40%
+    );
   position: relative;
   overflow: hidden;
   /* Ensure particles don't spill out */
@@ -267,9 +327,9 @@ footer {
   background-color: var(--card-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
   border-radius: 16px;
-  padding: 4rem 3rem;
+  padding: var(--space-7);
   /* Increased from 3rem 2rem */
   max-width: 1000px;
   /* Increased from 900px */
@@ -277,46 +337,78 @@ footer {
   box-shadow: var(--shadow-lg);
 }
 
-.hero h1 {
-  font-size: 4rem; /* Increased size for impact */
-  font-weight: 800; /* Extra bold */
-  letter-spacing: -0.02em;
-  margin-bottom: 1.5rem;
-  line-height: 1.1;
-  background: var(--text-gradient);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/*
+ * The name leads. Every hero text block lives in one column, so the title,
+ * statement, bio and buttons all align to the name's left edge — they used to
+ * sit in two different containers, 172px apart.
+ */
+.hero-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6);
 }
 
-.hero p {
-  font-size: 1.35rem;
-  /* Increased from 1.25rem */
-  color: var(--text-secondary);
-  line-height: 1.7;
-  /* Added for better readability */
-  max-width: 600px;
-  margin: 0 auto var(--spacing-lg);
+.hero-text {
+  max-width: var(--measure);
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 4.5vw, 3rem);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+#profile-titles {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--accent-color);
+  margin-bottom: var(--space-3);
+}
+
+.hero-statement {
+  font-size: var(--fs-title);
+  line-height: var(--lh-snug);
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+}
+
+.hero-cv {
+  margin: 0;
+}
+
+.hero-cv .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 /* Specific styling for bio */
 #profile-bio {
-  font-size: 1.1rem;
-  line-height: 1.8;
-  max-width: 850px;
-  /* Wider than titles */
-  margin: 0 auto var(--spacing-lg);
+  font-size: var(--fs-lead);
+  line-height: var(--lh-body);
+  color: var(--text-primary);
 }
 
 .social-links {
   display: flex;
-  justify-content: center;
-  gap: var(--spacing-lg);
-  margin-top: var(--spacing-lg);
+  gap: var(--space-4);
 }
 
 .social-icon {
-  font-size: 2.5rem;
+  display: inline-flex;
+  font-size: 2.5rem /* sizes the SVG, which is 1em */;
   color: var(--text-secondary);
   transition:
     transform 0.2s ease,
@@ -330,43 +422,25 @@ footer {
 
 /* Sections */
 section {
-  padding: 5rem 0;
+  padding: var(--space-8) 0;
   /* Increased from 4rem for better breathing room */
   border-bottom: 1px solid var(--border-color);
 }
 
 section h2 {
-  font-size: 2.5rem; /* Standardized sizing */
-  font-weight: 700;
-  margin-bottom: 3rem;
+  font-family: var(--font-display);
+  font-size: var(--fs-section);
+  font-weight: 600;
+  margin-bottom: var(--space-7);
   color: var(--text-primary);
-  position: relative;
-  display: inline-block;
-  background: var(--accent-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   letter-spacing: -0.02em;
-}
-
-section h2::after {
-  content: "";
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-  width: 120px;
-  /* Longer underline from 100px */
-  height: 5px;
-  /* Thicker from 4px */
-  background: var(--accent-gradient);
-  border-radius: 2px;
 }
 
 /* Cards (Publications, Experience) */
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: var(--spacing-lg);
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
   align-items: stretch;
   /* Ensure cards stretch to same height */
 }
@@ -376,181 +450,121 @@ section h2::after {
   background-color: var(--card-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 2.5rem;
-  /* Increased from 2rem for better breathing room */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  min-height: 280px;
-  /* Minimum height for consistency */
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-rest);
+  padding: var(--surface-pad);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
   height: 100%;
   display: flex;
   flex-direction: column;
-  border-left: 4px solid var(--accent-color);
   position: relative;
   overflow: hidden;
 }
 
-.card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    to bottom right,
-    rgba(255, 255, 255, 0.03),
-    transparent
-  );
-  pointer-events: none;
-}
-
 .card:hover {
-  transform: translateY(-5px) scale(1.02);
+  transform: translateY(-3px);
   box-shadow: var(--card-hover-shadow);
   border-color: var(--accent-color);
 }
 
 .card h3 {
   color: var(--accent-color);
-  margin-bottom: 0.75rem;
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1.3;
-}
-
-.card h4 {
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
-  font-size: 1.125rem;
+  margin-bottom: var(--space-2);
+  font-size: var(--fs-title);
   font-weight: 600;
-  opacity: 0.95;
+  line-height: var(--lh-snug);
 }
 
 .card .meta {
   font-family: var(--font-mono);
-  font-size: 0.875rem;
+  font-size: var(--fs-meta);
   color: var(--text-secondary);
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--space-4);
   display: inline-block;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.25rem 0.75rem;
+  background: var(--overlay-tint);
+  padding: var(--space-1) var(--space-3);
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
 }
 
 .card p,
 .card li {
-  font-size: 1rem;
+  font-size: var(--fs-body);
   color: var(--text-secondary);
-  line-height: 1.8;
+  line-height: var(--lh-body);
   /* Increased from 1.7 for better readability */
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
   /* Increased from 0.5rem */
 }
 
 .card ul {
-  padding-left: 1.2rem;
-  margin-top: 1rem;
+  padding-left: var(--space-4);
+  margin-top: var(--space-4);
   /* Increased from 0.5rem */
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
   /* Added bottom margin */
   list-style-position: inside;
   color: var(--text-secondary);
 }
 
 .card ul li {
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--space-3);
   /* Increased from 0.5rem for better spacing */
-  line-height: 1.7;
+  line-height: var(--lh-body);
 }
 
 /* Skills */
 .skills-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.875rem;
+  gap: var(--space-3);
   /* Increased from 1rem for better spacing */
   list-style: none;
 }
 
 .skill-tag {
-  background-color: rgba(6, 182, 212, 0.1);
+  background-color: rgba(var(--accent-rgb), 0.1);
   color: var(--accent-color);
-  padding: 0.625rem 1.25rem;
+  padding: var(--space-2) var(--space-4);
   /* Increased padding for better touch targets */
   border-radius: 9999px;
-  font-size: 0.95rem;
+  font-size: var(--fs-meta);
   /* Slightly larger from 0.9rem */
   font-weight: 500;
-  border: 1px solid rgba(6, 182, 212, 0.2);
-  transition: all 0.2s ease;
-  /* Added transition */
+  border: 1px solid rgba(var(--accent-rgb), 0.2);
 }
 
-.skill-tag:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
-}
+/*
+ * No :hover lift here. Skill tags are plain <li>/<span> labels, so a hover
+ * affordance advertises an interaction that does not exist — and inside the
+ * project cards it made every tag twitch whenever the card was hovered.
+ */
 
 /* Footer */
 footer {
   text-align: center;
-  padding: var(--spacing-xl) 0;
+  padding: var(--space-8) 0;
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: var(--fs-meta);
 }
 
 /* Profile Photo with Animation */
-.profile-photo-container {
-  margin-bottom: 2.5rem;
-  /* Increased from 2rem */
-  position: relative;
-  display: inline-block;
-}
-
 .profile-photo {
-  width: 200px;
-  /* Increased from 180px */
-  height: 200px;
-  /* Increased from 180px */
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid var(--accent-color);
-  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-  /* CNN Training Animation Effect */
-  animation: pulse-glow 3s infinite ease-in-out;
-}
-
-@keyframes pulse-glow {
-  0% {
-    box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
-    border-color: var(--accent-color);
-  }
-
-  50% {
-    box-shadow:
-      0 0 40px rgba(6, 182, 212, 0.6),
-      0 0 80px rgba(6, 182, 212, 0.2);
-    border-color: #22d3ee;
-    /* Lighter cyan */
-  }
-
-  100% {
-    box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
-    border-color: var(--accent-color);
-  }
+  border: 2px solid var(--border-color);
+  flex: none;
+  transition: border-color 0.2s ease;
 }
 
 .profile-photo:hover {
-  transform: scale(1.05);
-  animation: none;
-  /* Pause animation on hover */
-  box-shadow: 0 0 30px rgba(6, 182, 212, 0.8);
+  border-color: var(--accent-hover);
 }
 
 /* Theme Toggle Button */
@@ -558,9 +572,9 @@ footer {
   background: none;
   border: none;
   color: var(--text-secondary);
-  font-size: 1.2rem;
+  font-size: 1.2rem /* sizes the SVG, which is 1em */;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: var(--space-2);
   transition: color 0.2s ease;
 }
 
@@ -573,10 +587,6 @@ footer {
 
 /* Responsive */
 @media (max-width: 768px) {
-  .hero h1 {
-    font-size: 2rem;
-  }
-
   nav {
     justify-content: space-between;
   }
@@ -590,17 +600,9 @@ footer {
 /* Removed specific overrides to ensure uniform card appearance */
 
 /* Responsive Grid Improvements */
-@media (min-width: 1024px) {
-  .card-grid {
-    grid-template-columns: repeat(3, 1fr);
-    /* 3 columns on large screens */
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (min-width: 768px) {
   .card-grid {
     grid-template-columns: repeat(2, 1fr);
-    /* 2 columns on medium screens */
   }
 }
 
@@ -613,27 +615,17 @@ footer {
   .card {
     min-height: auto;
     /* Remove min-height on mobile */
-    padding: 2rem;
+    padding: var(--space-6);
     /* Reduce padding on mobile */
   }
 
-  .hero h1 {
-    font-size: 2.5rem;
-    /* Adjusted from 2rem */
-  }
-
   .hero p {
-    font-size: 1.1rem;
+    font-size: var(--fs-body);
   }
 
   section {
-    padding: 3rem 0;
+    padding: var(--space-7) 0;
     /* Reduce section padding on mobile */
-  }
-
-  section h2 {
-    font-size: 2.25rem;
-    /* Smaller on mobile */
   }
 }
 
@@ -647,80 +639,411 @@ footer {
 
 /* Tag row inside project cards */
 .card-tag-row {
-  margin-top: 1rem;
+  margin-top: var(--space-4);
 }
 
 /* Smaller skill tags inside project cards */
 .skill-tag--sm {
-  font-size: 0.8rem;
+  font-size: var(--fs-micro);
+}
+
+/* ── Icons ────────────────────────────────────────────────────────────── */
+
+/* The sprite is inlined at the top of <body>; it only defines symbols. */
+.icon-sprite {
+  display: none;
+}
+
+/*
+ * Icons are <svg><use>, sized in em so they track the surrounding text, and
+ * filled with currentColor so they inherit whatever colour the context sets.
+ */
+.icon {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+  vertical-align: -0.125em;
+  flex: none;
 }
 
 /* Icon inside card h3 */
 .card-icon {
   margin-right: 8px;
-  font-size: 0.9em;
+  width: 0.9em;
+  height: 0.9em;
 }
 
 /* Small external-link icon */
 .card-ext-icon {
-  font-size: 0.8em;
   margin-left: 5px;
+  width: 0.8em;
+  height: 0.8em;
 }
 
 /* "View Certificate" label */
 .card-view-link {
   margin-top: auto;
   color: var(--accent-color);
-  font-size: 0.9rem;
+  font-size: var(--fs-meta);
 }
 
-/* ── Publication type badges ── */
-.pub-badge-row {
-  margin-bottom: 0.75rem;
+/* ── Accessibility ────────────────────────────────────────────────────── */
+
+/* Visible only once focused, so keyboard users can jump past the nav. */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-4);
+  z-index: 200;
+  padding: var(--space-3) var(--space-4);
+  background: var(--accent-color);
+  color: var(--primary-color);
+  font-weight: 600;
+  border-radius: 0 0 8px 8px;
+  transition: top 0.2s ease;
 }
 
-.pub-badge {
+.skip-link:focus {
+  top: 0;
+  text-decoration: none;
+}
+
+/*
+ * Inline text links carry an underline, not colour alone. Required by the
+ * monochrome light theme, where --accent-color and --text-primary are the
+ * same value, so colour cannot distinguish a link from body text.
+ */
+.footer-link,
+.policy-link {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* Keyboard focus ring — the default is invisible against the dark theme. */
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--accent-color);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/*
+ * Respect a system-level request for less motion: no drifting particles
+ * (script.js draws one static frame instead), no pulsing avatar, no
+ * transitions. Hover transforms are kept as they are user-initiated.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Hero call-to-action ──────────────────────────────────────────────── */
+
+/* The `hidden` attribute loses to any display rule, so enforce it. */
+[hidden] {
+  display: none !important;
+}
+
+/* Two classes so this beats the `.hero p` margin rule above. */
+
+.hero-actions .btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 0.25rem 0.65rem;
-  border-radius: 9999px;
+  gap: var(--space-2);
 }
 
-.pub-badge--journal {
-  background: rgba(6, 182, 212, 0.12);
+.footer-link {
   color: var(--accent-color);
-  border: 1px solid rgba(6, 182, 212, 0.3);
 }
 
-.pub-badge--presentation {
-  background: rgba(251, 191, 36, 0.12);
-  color: #fbbf24;
-  border: 1px solid rgba(251, 191, 36, 0.3);
+/* ── Cookie policy page ───────────────────────────────────────────────── */
+
+.policy-section {
+  padding: var(--space-8) 0;
+  border-bottom: none;
 }
 
-/* Presentation card gets an amber left border */
-.card--presentation {
-  border-left-color: #fbbf24;
+.policy-card {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: left;
 }
 
-.card--presentation:hover {
-  box-shadow: 0 20px 40px -15px rgba(251, 191, 36, 0.2);
-  border-color: #fbbf24;
+.policy-card h1 {
+  margin-bottom: var(--space-6);
+  font-family: var(--font-display);
+  font-size: var(--fs-section);
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
-/* High-contrast theme overrides for badges */
-[data-theme="contrast"] .pub-badge--journal,
-[data-theme="contrast"] .pub-badge--presentation {
+.policy-card h2 {
+  margin-top: var(--space-7);
+  margin-bottom: var(--space-4);
+  font-family: var(--font-display);
+  font-size: var(--fs-title);
+  font-weight: 600;
+}
+
+.policy-card p {
+  margin-bottom: var(--space-4);
+  color: var(--text-secondary);
+}
+
+.policy-link {
+  color: var(--accent-color);
+}
+
+.policy-note {
+  margin: var(--space-6) 0;
+  padding: var(--space-4);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.policy-note p {
+  margin: 0;
+  font-size: var(--fs-meta);
+}
+
+.policy-block {
+  margin: var(--space-6) 0;
+}
+
+.policy-list {
+  list-style-type: disc;
+  padding-left: var(--space-6);
+  margin: var(--space-4) 0;
+  color: var(--text-secondary);
+}
+
+.policy-footer {
+  margin-top: var(--space-7);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+}
+
+/* ── Restructured sections ────────────────────────────────────────────── */
+
+/*
+ * Publications, experience and education are not card-shaped. They fill a
+ * plain block instead of the auto-fill grid, so each can take the form its
+ * content actually has.
+ */
+.section-body {
+  display: block;
+}
+
+/* Belt and braces: nothing inside an entry runs past the measure. */
+.biblio-entry > *,
+.timeline-entry > *,
+.edu-item > * {
+  max-width: var(--measure);
+}
+
+/* ── Publications: a bibliography with a year rail ────────────────────── */
+
+.biblio,
+.timeline,
+.edu-list {
+  list-style: none;
+}
+
+/*
+ * Every entry sits on its own surface. These sections used to be bare text
+ * over the particle canvas, which is genuinely hard to read — the canvas is
+ * animating behind it.
+ */
+.biblio-item,
+.timeline-item,
+.edu-item {
+  display: grid;
+  grid-template-columns: var(--rail) 1fr;
+  gap: 0 var(--space-6);
+  background-color: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-rest);
+  padding: var(--surface-pad);
+  margin-bottom: var(--space-4);
+}
+
+/* The only accent border on the page, so it reads as a distinction again. */
+.biblio-item--talk {
+  border-left: 4px solid var(--mark-color);
+}
+
+/*
+ * The rails. The year and period are structural markers because chronology is
+ * real information here — not ornamental 01/02/03 counters.
+ *
+ * line-height matches the title's line box beside it, so the first line of the
+ * rail and the first line of the title sit on one baseline. That only works
+ * because serif, sans and mono here come from one superfamily and share
+ * vertical metrics.
+ */
+.biblio-year,
+.timeline-period,
+.edu-meta {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-meta);
+  font-weight: 500;
+  line-height: calc(var(--fs-title) * var(--lh-snug));
+  color: var(--text-secondary);
+}
+
+.biblio-item--talk .biblio-year {
+  color: var(--mark-color);
+}
+
+.biblio-title {
+  font-size: var(--fs-title);
+  font-weight: 600;
+  line-height: var(--lh-snug);
+  margin-bottom: var(--space-1);
+}
+
+.biblio-title a {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.biblio-title a:hover {
+  color: var(--accent-color);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.biblio-arrow {
+  margin-left: var(--space-2);
+  width: 0.7em;
+  height: 0.7em;
+  color: var(--accent-color);
+}
+
+.biblio-authors {
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  margin-bottom: var(--space-1);
+}
+
+.biblio-venue {
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  color: var(--text-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.biblio-kind {
+  font-size: var(--fs-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: var(--space-1) var(--space-2);
+  border-radius: 3px;
+  background: var(--overlay-tint);
+  color: var(--text-secondary);
+}
+
+.biblio-item--talk .biblio-kind {
+  color: var(--mark-color);
+  border: 1px solid var(--mark-color);
   background: transparent;
-  color: #ffff00;
-  border-color: #ffff00;
 }
 
-[data-theme="contrast"] .card--presentation {
-  border-left-color: #ffff00;
+.biblio-note {
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  margin-top: var(--space-2);
+}
+
+/* ── Experience: a dated spine ────────────────────────────────────────── */
+
+.timeline-role {
+  font-size: var(--fs-title);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: var(--lh-snug);
+}
+
+.timeline-org {
+  color: var(--accent-color);
+  font-size: var(--fs-body);
+  margin-bottom: var(--space-2);
+}
+
+.timeline-points {
+  padding-left: var(--space-4);
+  color: var(--text-secondary);
+}
+
+.timeline-points li {
+  font-size: var(--fs-body);
+  margin-bottom: var(--space-1);
+}
+
+/* ── Education: compact, two across ───────────────────────────────────── */
+
+.edu-entry {
+  max-width: var(--measure);
+}
+
+.edu-degree {
+  font-size: var(--fs-title);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: var(--lh-snug);
+}
+
+.edu-org {
+  color: var(--accent-color);
+  font-size: var(--fs-body);
+}
+
+.edu-note {
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  margin-top: var(--space-1);
+}
+
+/* ── Narrow screens: rails stack above their content ──────────────────── */
+
+@media (max-width: 640px) {
+  .biblio-item,
+  .timeline-item,
+  .edu-item {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
+
+  .hero-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+}
+
+/* Hero stacks on small screens; the statement stays the lead. */
+@media (max-width: 640px) {
+  .hero-detail {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .hero-statement {
+    max-width: none;
+  }
 }

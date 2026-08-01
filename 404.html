@@ -3,46 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- See index.html for notes on this policy. No inline scripts on this page. -->
+    <!-- No analytics or consent tooling here: this page sets no cookies. -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; script-src 'self' https://www.googletagmanager.com https://consent-eu.cookiefirst.com https://cdn.cookiefirst.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://www.google-analytics.com https://*.cookiefirst.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.cookiefirst.com; frame-src https://consent-eu.cookiefirst.com; upgrade-insecure-requests;"
+      content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; upgrade-insecure-requests;"
     />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-
-    <title>Cookie Policy - Mukesh Khanore</title>
-    <meta
-      name="description"
-      content="Cookie policy for mukeshkhanore.github.io — which cookies are used, why, and how to manage your consent."
-    />
-    <meta name="theme-color" content="#2c3e50" />
     <meta name="robots" content="noindex, follow" />
-    <link
-      rel="canonical"
-      href="https://mukeshkhanore.github.io/cookie-policy.html"
-    />
+
+    <title>Page Not Found - Mukesh Khanore</title>
+    <meta name="theme-color" content="#2c3e50" />
     <link
       rel="icon"
       type="image/svg+xml"
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚛️</text></svg>"
     />
-    <link rel="stylesheet" href="Assets/style.css" />
+    <!-- Absolute paths: this page is served for URLs at any depth. -->
+    <link rel="stylesheet" href="/Assets/style.css" />
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500&amp;family=Source+Sans+3:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,600&amp;display=swap"
       rel="stylesheet"
     />
-
-    <!-- Consent banner. Must load before analytics so no cookie is set first. -->
-    <script src="https://consent-eu.cookiefirst.com/sites/mukeshkhanore.github.io-8c8a1728-7075-4f89-a2cc-051c120599b0/consent.js"></script>
-    <script src="Assets/analytics.js"></script>
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-TEYETSEN4Z"
-    ></script>
   </head>
 
   <body>
@@ -143,9 +127,6 @@
         />
       </symbol>
     </svg>
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-
-    <!-- Decorative background animation -->
     <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
     <header>
@@ -153,9 +134,9 @@
         <nav aria-label="Main navigation">
           <div class="logo">MK.</div>
           <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="index.html#about">About</a></li>
-            <li><a href="index.html#contact">Contact</a></li>
+            <li><a href="/">Home</a></li>
+            <li><a href="/#publications">Publications</a></li>
+            <li><a href="/#contact">Contact</a></li>
           </ul>
           <button
             type="button"
@@ -184,133 +165,17 @@
     </header>
 
     <main id="main-content">
-      <section class="policy-section" aria-labelledby="policy-heading">
+      <section class="hero" aria-labelledby="notfound-heading">
         <div class="container">
-          <div class="hero-card policy-card">
-            <h1 id="policy-heading">Cookie Policy</h1>
-
-            <!-- CookieFirst policy page container -->
-            <div id="cookiefirst-policy-page"></div>
-
-            <div class="policy-note">
-              <p>
-                This cookie policy has been created and updated by
-                <a
-                  href="https://cookiefirst.com/cookie-scanner/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="policy-link"
-                  >Cookie Scanner</a
-                >.
-              </p>
-            </div>
-
-            <!-- CookieFirst cookies table -->
-            <div id="cookiefirst-cookies-table" class="policy-block"></div>
-
-            <div class="policy-note">
-              <p>
-                This cookie table has been created and updated by the
-                <a
-                  href="https://cookiefirst.com/cookie-policy-generator/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="policy-link"
-                  >Cookie Policy Generator</a
-                >.
-              </p>
-            </div>
-
-            <h2>Consent to the use of cookies</h2>
+          <div class="hero-card">
+            <h1 id="notfound-heading">404</h1>
             <p>
-              For our website to function properly we use cookies. To obtain
-              your valid consent for the use and storage of cookies in the
-              browser you use to access our website and to properly document
-              this we use a consent management platform: CookieFirst. This
-              technology is provided by Digital Data Solutions BV, Plantage
-              Middenlaan 42a, 1018 DH, Amsterdam, The Netherlands. Website:
-              <a
-                href="https://cookiefirst.com"
-                title="Cookiefirst page"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="policy-link"
-                >https://cookiefirst.com</a
-              >
-              referred to as CookieFirst.
+              That page could not be found. It may have been moved or the link
+              may be out of date.
             </p>
-            <p>
-              When you access our website, a connection is established with
-              CookieFirst's server to give us the possibility to obtain valid
-              consent from you to the use of certain cookies. CookieFirst then
-              stores a cookie in your browser in order to be able to activate
-              only those cookies to which you have consented and to properly
-              document this. The data processed is stored until the predefined
-              storage period expires or you request to delete the data. Certain
-              mandatory legal storage periods may apply notwithstanding the
-              aforementioned.
+            <p class="hero-actions">
+              <a href="/" class="btn">Back to Home</a>
             </p>
-            <p>
-              CookieFirst is used to obtain the legally required consent for the
-              use of cookies. The legal basis for this is article 6(1)(c) of the
-              General Data Protection Regulation (GDPR).
-            </p>
-
-            <h2>Analytics</h2>
-            <p>
-              This site uses Google Analytics 4 to understand aggregate traffic.
-              Analytics storage is denied by default and is only enabled after
-              you accept the performance category in the consent banner. You can
-              change or withdraw your choice at any time using the button below.
-            </p>
-            <p>
-              <button
-                type="button"
-                id="manage-consent"
-                class="btn"
-                data-cookiefirst-action="open-panel"
-              >
-                Manage cookie preferences
-              </button>
-            </p>
-
-            <h2>Data processing agreement</h2>
-            <p>
-              We have concluded a data processing agreement with CookieFirst.
-              This is a contract required by data protection law, which ensures
-              that data of our website visitors is only processed in accordance
-              with our instructions and in compliance with the GDPR.
-            </p>
-
-            <h2>Server log files</h2>
-            <p>
-              Our website and CookieFirst automatically collect and store
-              information in so-called server log files, which your browser
-              automatically transmits to us. The following data is collected:
-            </p>
-            <ul class="policy-list">
-              <li>Your consent status or the withdrawal of consent</li>
-              <li>Your anonymised IP address</li>
-              <li>Information about your Browser</li>
-              <li>Information about your Device</li>
-              <li>The date and time you have visited our website</li>
-              <li>
-                The webpage url where you saved or updated your consent
-                preferences
-              </li>
-              <li>
-                The approximate location of the user that saved their consent
-                preference
-              </li>
-              <li>
-                A universally unique identifier (UUID) of the website visitor
-                that clicked the cookie banner
-              </li>
-            </ul>
-
-            <div class="policy-footer">
-              <a href="index.html" class="btn">Back to Home</a>
-            </div>
           </div>
         </div>
       </section>
@@ -322,6 +187,6 @@
       </div>
     </footer>
 
-    <script src="Assets/script.js"></script>
+    <script src="/Assets/script.js"></script>
   </body>
 </html>

@@ -1,0 +1,17 @@
+max_retries = 3
+timeout = 20
+exclude_mail = true
+
+accept = [200, 203, 206, 429]
+
+exclude = [
+  # These sites reject datacentre traffic outright, so a failure here says
+  # nothing about whether the link works in a browser.
+  "^https://www\\.linkedin\\.com",
+  "^https://www\\.researchgate\\.net",
+  "^https://scholar\\.google\\.com",
+  "^https://orcid\\.org",
+
+  # TODO: delete this line once Assets/Mukesh_Khanore_CV.pdf is committed.
+  "Mukesh_Khanore_CV\\.pdf",
+]

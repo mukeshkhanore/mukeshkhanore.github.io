@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # Weekly run: a CDN file can change under a pinned SRI hash, which silently
+  # blocks the resource. Catch it here rather than on the live site.
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Format, HTML, integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # `ci` not `install`: installs exactly what package-lock.json pins, so a
+      # compromised patch release cannot slip into the runner.
+      - name: Install tooling
+        run: npm ci --no-audit --no-fund
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Validate HTML
+        run: npm run lint:html
+
+      - name: Icon sprite is in sync
+        run: node scripts/build-icons.js --check
+
+      - name: Pre-rendered HTML matches data.js
+        run: node scripts/prerender.js --check
+
+      - name: Verify SRI and CSP hashes
+        run: npm run integrity
+
+      - name: Render smoke test
+        run: npm test
+
+  links:
+    name: Link check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --config lychee.toml --no-progress index.html cookie-policy.html 404.html Assets/data.js
+          fail: true
