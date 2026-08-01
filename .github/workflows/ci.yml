@@ -56,5 +56,13 @@ jobs:
       - name: Check links
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --config lychee.toml --no-progress index.html cookie-policy.html 404.html Assets/data.js
+          # --root-dir is required because 404.html links to "/" and
+          # "/Assets/style.css". Those absolute paths are deliberate — GitHub
+          # Pages serves that page for URLs at any depth — but lychee cannot
+          # resolve a root-relative link in a local file without being told
+          # where the site root is.
+          args: >-
+            --config lychee.toml --no-progress
+            --root-dir ${{ github.workspace }}
+            index.html cookie-policy.html 404.html Assets/data.js
           fail: true
