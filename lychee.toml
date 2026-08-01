@@ -2,7 +2,10 @@ max_retries = 3
 timeout = 20
 include_mail = false
 
-accept = [200, 203, 206, 429]
+# Strings, not integers. lychee rejects `accept = [200, 429]` as a type error
+# and exits before checking anything, which is why every run failed in under
+# ten seconds without reporting a single broken link.
+accept = ["200", "203", "206", "429"]
 
 exclude = [
   # ── Not links at all ──────────────────────────────────────────────────
