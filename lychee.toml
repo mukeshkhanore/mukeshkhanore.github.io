@@ -5,8 +5,25 @@ include_mail = false
 accept = [200, 203, 206, 429]
 
 exclude = [
-  # These sites reject datacentre traffic outright, so a failure here says
-  # nothing about whether the link works in a browser.
+  # ── Not links at all ──────────────────────────────────────────────────
+  # The Content-Security-Policy meta tag lists allowed origins, and lychee
+  # treats every "https://…" in the page as a link to fetch. A bare CDN or
+  # analytics origin serves nothing at "/", so it 404s or 403s. These hosts
+  # appear only in the CSP or as a script/style src.
+  "^https://\\*\\.", # wildcard CSP entries, e.g. https://*.cookiefirst.com
+  "fonts\\.googleapis\\.com",
+  "fonts\\.gstatic\\.com",
+  "googletagmanager\\.com",
+  "google-analytics\\.com",
+  "analytics\\.google\\.com",
+  "consent-eu\\.cookiefirst\\.com", # per-site script; the bare origin 403s
+  "cdn\\.cookiefirst\\.com",
+
+  # ── Real links that reject automated traffic ──────────────────────────
+  # doi.org redirects to the publisher (AIP, IOP, Springer) and those block
+  # datacentre requests, so a failure here says nothing about whether the
+  # link works in a browser.
+  "^https://doi\\.org/",
   "^https://www\\.linkedin\\.com",
   "^https://www\\.researchgate\\.net",
   "^https://scholar\\.google\\.com",
