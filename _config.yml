@@ -1,0 +1,30 @@
+# GitHub Pages (Jekyll) configuration.
+#
+# The only job of this file is to keep build tooling out of the published site.
+# Pages serves the repository root, so without this, https://…/package.json and
+# https://…/scripts/prerender.js would both resolve.
+#
+# Setting `exclude` REPLACES Jekyll's default list rather than adding to it, so
+# the defaults are repeated below. Dot-files and dot-directories (.github/,
+# .prettierrc, .htmlvalidate.json) are excluded by Jekyll automatically.
+#
+# Never add a served file here — anything listed is absent from the live site.
+# index.html, cookie-policy.html, 404.html, robots.txt, sitemap.xml and
+# everything under Assets/ must stay published.
+
+exclude:
+  # Jekyll defaults, restated because `exclude` overrides them.
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+
+  # This project's build tooling — needed in the repository, not on the web.
+  - package.json
+  - package-lock.json
+  - scripts/
+  - lychee.toml
+  - README.md

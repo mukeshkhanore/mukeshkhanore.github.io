@@ -1,378 +1,651 @@
-// Security: HTML Sanitization Utility
-function escapeHtml(unsafe) {
-    if (typeof unsafe !== 'string') return unsafe;
-    return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+/**
+ * Portfolio renderer.
+ *
+ * Content lives in Assets/data.js. To add or change a section, edit that file
+ * and (for a brand new section) add an entry to SECTION_SPECS below plus a
+ * matching <section> in index.html. Nothing else needs to change.
+ */
+
+/* ── Escaping helpers ─────────────────────────────────────────────────── */
+
+const HTML_ENTITIES = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#039;",
+};
+
+/** Escape a value for interpolation into HTML text or a quoted attribute. */
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (c) => HTML_ENTITIES[c]);
 }
 
-// Security: Input Validation
+/**
+ * Escape a value for an href. Anything that is not http/https/mailto is
+ * dropped, so a malformed or javascript: URL in data.js can never become a
+ * live link.
+ */
+const SAFE_PROTOCOLS = ["http:", "https:", "mailto:"];
+function safeUrl(value) {
+  try {
+    const url = new URL(String(value ?? ""), document.baseURI);
+    return SAFE_PROTOCOLS.includes(url.protocol) ? esc(url.href) : "#";
+  } catch {
+    return "#";
+  }
+}
+
+/**
+ * Symbols present in the inlined Assets/icons.svg sprite. Regenerate both with
+ * `npm run icons` after adding a new icon to data.js.
+ */
+const ICON_IDS = new Set([
+  "adjust",
+  "bars",
+  "envelope",
+  "file-arrow-down",
+  "github",
+  "google",
+  "graduation-cap",
+  "link",
+  "linkedin",
+  "microchip",
+  "moon",
+  "orcid",
+  "researchgate",
+  "sun",
+]);
+
+/**
+ * Turn a FontAwesome class string from data.js ("fab fa-github") into a
+ * reference to the local sprite. Unknown names fall back to a generic link
+ * glyph rather than rendering an empty box.
+ */
+function icon(value, extraClass) {
+  const match = /fa-([a-z0-9-]+)/.exec(String(value ?? ""));
+  const name = match && ICON_IDS.has(match[1]) ? match[1] : "link";
+  const cls = extraClass ? `icon ${extraClass}` : "icon";
+  return `<svg class="${cls}" aria-hidden="true"><use href="#i-${name}"></use></svg>`;
+}
+
+/* ── Data validation ──────────────────────────────────────────────────── */
+
+const REQUIRED_SECTIONS = [
+  "profile",
+  "education",
+  "experience",
+  "projects",
+  "publications",
+  "activities",
+  "skills",
+  "certificates",
+  "teaching",
+];
+
 function validatePortfolioData(data) {
-    if (!data || typeof data !== 'object') {
-        console.error('Invalid portfolio data: not an object');
-        return false;
-    }
+  if (!data || typeof data !== "object") {
+    console.error("Invalid portfolio data: not an object");
+    return false;
+  }
 
-    // Validate required sections
-    const requiredSections = ['profile', 'education', 'experience', 'projects', 'publications', 'activities', 'skills', 'certificates', 'teaching'];
-    for (const section of requiredSections) {
-        if (!data[section]) {
-            console.error(`Invalid portfolio data: missing ${section} section`);
-            return false;
-        }
+  for (const section of REQUIRED_SECTIONS) {
+    if (!data[section]) {
+      console.error(`Invalid portfolio data: missing "${section}" section`);
+      return false;
     }
+  }
 
-    // Validate profile section
-    if (!data.profile.name || !data.profile.titles || !data.profile.bio) {
-        console.error('Invalid portfolio data: missing required profile fields');
-        return false;
-    }
+  const { name, titles, bio } = data.profile;
+  if (!name || !titles || !bio) {
+    console.error("Invalid portfolio data: missing required profile fields");
+    return false;
+  }
 
-    return true;
+  return true;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Theme Toggle Logic
-    // Background Animation: Particle Network
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
+/* ── Card rendering ───────────────────────────────────────────────────── */
 
-    let particlesArray;
+/**
+ * Build one card from a plain descriptor. Every section funnels through here,
+ * so escaping and markup stay consistent.
+ *
+ * Publications and experience no longer come through here — they have their
+ * own renderers — so the badge and subtitle affordances they needed are gone.
+ *
+ * Descriptor fields (all optional except title):
+ *   href                 makes the whole card a link
+ *   titleIconLeading     icon before the title
+ *   meta                 mono label line
+ *   body []              paragraphs
+ *   list []              bulleted items
+ *   pills []             skill-tag pills
+ *   tags []              small skill-tag pills in a bottom row
+ *   footer               call-to-action line
+ */
+function renderCard(card) {
+  const isLink = Boolean(card.href);
+  const tag = isLink ? "a" : "article";
+  const attrs = isLink
+    ? ` href="${safeUrl(card.href)}" target="_blank" rel="noopener noreferrer"`
+    : "";
+  const classes = ["card", isLink ? "card--link" : ""]
+    .filter(Boolean)
+    .join(" ");
 
-    // Set Canvas Size
+  const leadingIcon = card.titleIconLeading
+    ? icon(card.titleIconLeading, "card-icon")
+    : "";
+
+  const meta = card.meta ? `<div class="meta">${esc(card.meta)}</div>` : "";
+
+  const body = (card.body || [])
+    .filter(Boolean)
+    .map((text) => `<p>${esc(text)}</p>`)
+    .join("");
+
+  const list = card.list?.length
+    ? `<ul>${card.list.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>`
+    : "";
+
+  const pills = card.pills?.length
+    ? `<ul class="skills-list">${card.pills
+        .map((pill) => `<li class="skill-tag">${esc(pill)}</li>`)
+        .join("")}</ul>`
+    : "";
+
+  const tags = card.tags?.length
+    ? `<div class="skills-list card-tag-row">${card.tags
+        .map((t) => `<span class="skill-tag skill-tag--sm">${esc(t)}</span>`)
+        .join("")}</div>`
+    : "";
+
+  const footer = card.footer
+    ? `<p class="card-view-link">${esc(card.footer)} ${icon("fa-external-link-alt", "card-ext-icon")}</p>`
+    : "";
+
+  return (
+    `<${tag} class="${classes}"${attrs}>` +
+    `<h3>${leadingIcon}${esc(card.title)}</h3>` +
+    `${meta}${body}${list}${pills}${tags}${footer}` +
+    `</${tag}>`
+  );
+}
+
+/* ── Section definitions ──────────────────────────────────────────────── */
+
+const SKILL_CATEGORIES = [
+  { title: "Languages & Packages", key: "languages", style: "pills" },
+  { title: "ML Tools", key: "ml_tools", style: "pills" },
+  { title: "Numerical Techniques", key: "numerical", style: "list" },
+  { title: "Cloud & Tools", key: "cloud", style: "list" },
+];
+
+/** Publication years live inside the venue string, e.g. "AIP Advances (2025)". */
+function yearOf(meta) {
+  const s = String(meta ?? "");
+  const parens = /\((\d{4})\)/.exec(s);
+  if (parens) return parens[1];
+  const loose = /\b(?:19|20)\d{2}\b/.exec(s);
+  return loose ? loose[0] : "";
+}
+
+/** Hyphenated ranges read as dashes: "Oct 2022 - Present" -> en dash. */
+const enDash = (s) => String(s ?? "").replace(/\s+-\s+/g, " – ");
+
+/**
+ * One entry per section: which grid it fills, and how the data becomes markup.
+ *
+ * Most sections map each item onto a card descriptor via `card` and share
+ * renderCard. Sections whose content is not card-shaped supply `render`
+ * instead and emit their own markup — publications are a bibliography and
+ * experience is a chronology, and flattening both into the same grid was the
+ * design problem this replaces.
+ */
+const SECTION_SPECS = {
+  publications: {
+    grid: "publications-grid",
+    /*
+     * Sorted newest first on the way out rather than in data.js, so the file
+     * stays a plain curated list. A year rail that runs 2025, 2022, 2026 reads
+     * as a rendering bug, so the display order has to match the device.
+     * Entries with no parseable year fall to the bottom.
+     */
+    transform: (items) =>
+      [...items].sort(
+        (a, b) => Number(yearOf(b.meta) || 0) - Number(yearOf(a.meta) || 0),
+      ),
+    render: (items) =>
+      `<ol class="biblio">` +
+      items
+        .map((item) => {
+          const isTalk = item.type === "presentation";
+          const year = yearOf(item.meta);
+          return (
+            `<li class="biblio-item${isTalk ? " biblio-item--talk" : ""}">` +
+            `<div class="biblio-year">${esc(year || "—")}</div>` +
+            `<div class="biblio-entry">` +
+            `<h3 class="biblio-title">` +
+            `<a href="${safeUrl(item.url)}" target="_blank" rel="noopener noreferrer">` +
+            `${esc(item.title)}${icon("fa-external-link-alt", "biblio-arrow")}</a></h3>` +
+            (item.authors
+              ? `<p class="biblio-authors">${esc(item.authors)}</p>`
+              : "") +
+            `<p class="biblio-venue">${esc(item.meta)}` +
+            `<span class="biblio-kind">${isTalk ? "presentation" : "journal"}</span></p>` +
+            (item.description
+              ? `<p class="biblio-note">${esc(item.description)}</p>`
+              : "") +
+            `</div></li>`
+          );
+        })
+        .join("") +
+      `</ol>`,
+  },
+
+  experience: {
+    grid: "experience-grid",
+    render: (items) =>
+      `<ol class="timeline">` +
+      items
+        .map(
+          (item) =>
+            `<li class="timeline-item">` +
+            `<div class="timeline-period">${esc(enDash(item.period))}</div>` +
+            `<div class="timeline-entry">` +
+            `<h3 class="timeline-role">${esc(item.role)}</h3>` +
+            `<p class="timeline-org">${esc(item.company)}</p>` +
+            (item.details?.length
+              ? `<ul class="timeline-points">${item.details
+                  .map((d) => `<li>${esc(d)}</li>`)
+                  .join("")}</ul>`
+              : "") +
+            `</div></li>`,
+        )
+        .join("") +
+      `</ol>`,
+  },
+
+  education: {
+    grid: "education-grid",
+    render: (items) =>
+      `<ol class="edu-list">` +
+      items
+        .map(
+          (item) =>
+            `<li class="edu-item">` +
+            `<div class="edu-meta">${esc(item.meta)}</div>` +
+            `<div class="edu-entry">` +
+            `<h3 class="edu-degree">${esc(item.degree)}</h3>` +
+            `<p class="edu-org">${esc(item.institution)}</p>` +
+            (item.description
+              ? `<p class="edu-note">${esc(item.description)}</p>`
+              : "") +
+            `</div></li>`,
+        )
+        .join("") +
+      `</ol>`,
+  },
+
+  projects: {
+    grid: "projects-grid",
+    card: (item) => ({
+      href: item.url,
+      title: item.name,
+      meta: item.meta,
+      body: [item.description],
+      tags: item.tags,
+    }),
+  },
+
+  skills: {
+    grid: "skills-grid",
+    transform: (skills) =>
+      SKILL_CATEGORIES.filter((cat) => Array.isArray(skills[cat.key])).map(
+        (cat) => ({ ...cat, items: skills[cat.key] }),
+      ),
+    card: (cat) => ({
+      title: cat.title,
+      [cat.style === "pills" ? "pills" : "list"]: cat.items,
+    }),
+  },
+
+  certificates: {
+    grid: "certificates-grid",
+    card: (item) => ({
+      href: item.url,
+      titleIconLeading: item.icon,
+      title: item.title,
+      meta: item.issuer,
+      body: [item.description],
+      footer: "View certificate",
+    }),
+  },
+
+  activities: {
+    grid: "conferences-grid",
+    card: (item) => ({
+      title: item.title,
+      meta: item.meta,
+      body: [item.description],
+    }),
+  },
+
+  teaching: {
+    grid: "teaching-grid",
+    card: (item) => ({
+      title: item.role,
+      meta: item.institution,
+      body: [item.description],
+    }),
+  },
+};
+
+function renderSections(data) {
+  for (const [key, spec] of Object.entries(SECTION_SPECS)) {
+    const grid = document.getElementById(spec.grid);
+    if (!grid) continue; // section not present on this page
+
+    const raw = data[key];
+    const items = spec.transform ? spec.transform(raw) : raw;
+    if (!Array.isArray(items)) {
+      console.error(`Section "${key}" did not produce a list of items`);
+      continue;
+    }
+
+    grid.innerHTML = spec.render
+      ? spec.render(items)
+      : items.map(spec.card).map(renderCard).join("");
+  }
+}
+
+function renderProfile(profile) {
+  const set = (id, text) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  };
+
+  set("profile-name", profile.name);
+  set("profile-statement", profile.statement);
+  set("profile-titles", profile.titles);
+  set("profile-bio", profile.bio);
+
+  const avatar = document.getElementById("profile-avatar");
+  if (avatar && profile.avatar) avatar.src = profile.avatar;
+
+  const social = document.getElementById("social-links");
+  if (social) {
+    social.innerHTML = (profile.social || [])
+      .map(
+        (link) =>
+          `<a href="${safeUrl(link.url)}" class="social-icon" aria-label="${esc(link.name)}" title="${esc(link.name)}"` +
+          ` target="_blank" rel="noopener noreferrer">${icon(link.icon)}</a>`,
+      )
+      .join("");
+  }
+}
+
+/* ── Background particle animation ────────────────────────────────────── */
+
+const MAX_PARTICLES = 120;
+
+function initBackground() {
+  const canvas = document.getElementById("bg-canvas");
+  if (!canvas) return null;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let particles = [];
+  let animFrameId = null;
+
+  // data-theme lives on <body>, so the accent must be read from there — reading
+  // from documentElement always returns the :root default.
+  function accentRgb() {
+    const hex = getComputedStyle(document.body)
+      .getPropertyValue("--accent-color")
+      .trim();
+    const match = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex);
+    // Fallback must track the :root --accent-color, or an unparseable value
+    // would draw particles in a colour the palette no longer contains.
+    return match
+      ? [parseInt(match[1], 16), parseInt(match[2], 16), parseInt(match[3], 16)]
+      : [82, 209, 184];
+  }
+
+  let accent = accentRgb();
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.directionX = Math.random() * 0.6 - 0.3;
+      this.directionY = Math.random() * 0.6 - 0.3;
+      this.size = Math.random() * 3 + 2; // 2–5 px
+    }
+
+    draw() {
+      ctx.save();
+      ctx.globalAlpha = 0.4;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+      ctx.fillStyle = `rgb(${accent[0]}, ${accent[1]}, ${accent[2]})`;
+      ctx.fill();
+      ctx.restore();
+    }
+
+    update() {
+      if (this.x > canvas.width || this.x < 0) this.directionX *= -1;
+      if (this.y > canvas.height || this.y < 0) this.directionY *= -1;
+      this.x += this.directionX;
+      this.y += this.directionY;
+      this.draw();
+    }
+  }
+
+  function connect() {
+    const threshold = (canvas.width / 6) * (canvas.height / 6);
+    for (let a = 0; a < particles.length; a++) {
+      for (let b = a + 1; b < particles.length; b++) {
+        const dx = particles[a].x - particles[b].x;
+        const dy = particles[a].y - particles[b].y;
+        const distance = dx * dx + dy * dy;
+        if (distance >= threshold) continue;
+
+        // Fade across the cull radius. This used to divide by a fixed 25000
+        // while the radius scales with the viewport, so above roughly
+        // 1000x900 the alpha went negative — an invalid rgba() string, which
+        // browsers ignore, leaving the line whatever colour was set last.
+        const opacity = (1 - distance / threshold) * 0.2;
+        ctx.strokeStyle = `rgba(${accent[0]}, ${accent[1]}, ${accent[2]}, ${opacity})`;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(particles[a].x, particles[a].y);
+        ctx.lineTo(particles[b].x, particles[b].y);
+        ctx.stroke();
+      }
+    }
+  }
+
+  function seed() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    const count = Math.min(
+      Math.floor((canvas.height * canvas.width) / 10000),
+      MAX_PARTICLES,
+    );
+    particles = Array.from({ length: count }, () => new Particle());
+  }
 
-    // Read particle colour from the currently active theme's accent colour
-    function getThemeParticleColor() {
-        return getComputedStyle(document.documentElement)
-            .getPropertyValue('--accent-color').trim() || '#00e1ff';
+  function drawFrame(move) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const particle of particles) {
+      if (move) particle.update();
+      else particle.draw();
     }
+    connect();
+  }
 
-    class Particle {
-        constructor() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.directionX = (Math.random() * 0.6) - 0.3;
-            this.directionY = (Math.random() * 0.6) - 0.3;
-            this.size = Math.random() * 3 + 2; // 2–5 px
-            this.color = getThemeParticleColor();
-        }
-
-        // Method to draw individual particle
-        draw() {
-            ctx.save();                        // #5 — prevent globalAlpha leak
-            ctx.globalAlpha = 0.4;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-            ctx.fillStyle = this.color;
-            ctx.fill();
-            ctx.restore();
-        }
-
-        // Check particle position, check mouse position, move the particle, draw the particle
-        update() {
-            // Check if particle is still within canvas
-            if (this.x > canvas.width || this.x < 0) {
-                this.directionX = -this.directionX;
-            }
-            if (this.y > canvas.height || this.y < 0) {
-                this.directionY = -this.directionY;
-            }
-
-            // Move particle
-            this.x += this.directionX;
-            this.y += this.directionY;
-
-            // Draw particle
-            this.draw();
-        }
+  function stop() {
+    if (animFrameId !== null) {
+      cancelAnimationFrame(animFrameId);
+      animFrameId = null;
     }
+  }
 
-    // Create particle array — capped at 120 to avoid O(n²) connect() cost
-    function init() {
-        particlesArray = [];
-        let numberOfParticles = Math.min(
-            Math.floor((canvas.height * canvas.width) / 10000),
-            120
-        );
-        for (let i = 0; i < numberOfParticles; i++) {
-            particlesArray.push(new Particle());
-        }
-    }
+  function loop() {
+    animFrameId = requestAnimationFrame(loop);
+    drawFrame(true);
+  }
 
-    // Animation Loop — paused when tab is not visible (#16)
-    let animFrameId;
-    function animate() {
-        animFrameId = requestAnimationFrame(animate);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+  /** Animate, or draw a single static frame when the visitor prefers less motion. */
+  function start() {
+    stop();
+    if (reduceMotion.matches) drawFrame(false);
+    else loop();
+  }
 
-        for (let i = 0; i < particlesArray.length; i++) {
-            particlesArray[i].update();
-        }
-        connect();
-    }
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stop();
+    else start();
+  });
 
-    // Page Visibility API: pause animation to save battery when tab is hidden
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            cancelAnimationFrame(animFrameId);
-        } else {
-            animate();
-        }
+  reduceMotion.addEventListener("change", start);
+
+  let resizeTimer;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      seed();
+      start();
+    }, 150);
+  });
+
+  seed();
+  start();
+
+  return {
+    refreshTheme() {
+      accent = accentRgb();
+      if (reduceMotion.matches) drawFrame(false);
+    },
+  };
+}
+
+/* ── CV download link ─────────────────────────────────────────────────── */
+
+/**
+ * The CV is an optional file that may not be committed yet. Its button starts
+ * hidden and is revealed only once a HEAD request confirms the file is really
+ * there, so a visitor is never offered a link that 404s.
+ *
+ * Failing closed is deliberate: if the probe errors, the button stays hidden.
+ */
+function initCvLink() {
+  const link = document.getElementById("cv-link");
+  if (!link) return;
+
+  const container = link.closest(".hero-cv") || link;
+
+  fetch(link.href, { method: "HEAD" })
+    .then((response) => {
+      if (response.ok) container.hidden = false;
+    })
+    .catch(() => {
+      // Offline, or the request was blocked — leave the button hidden.
     });
+}
 
-    // Check if particles are close enough to draw line
-    function connect() {
-        let opacityValue = 1;
-        for (let a = 0; a < particlesArray.length; a++) {
-            for (let b = a; b < particlesArray.length; b++) {
-                let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) +
-                    ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+/* ── Theme toggle ─────────────────────────────────────────────────────── */
 
-                // Increased connection distance (was /7 * /7)
-                if (distance < (canvas.width / 6) * (canvas.height / 6)) {
-                    opacityValue = 1 - (distance / 25000); // Adjusted fade factor
-                    ctx.strokeStyle = 'rgba(0, 225, 255,' + opacityValue * 0.2 + ')'; // Reduced line opacity (was 0.4)
-                    ctx.lineWidth = 1.5; // Thicker lines
-                    ctx.beginPath();
-                    ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-                    ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
-                    ctx.stroke();
-                }
-            }
-        }
+// `name` is the stored key, so it stays stable; `next` is what the button says.
+const THEMES = [
+  { name: "atomic", icon: "i-moon", next: "light theme" },
+  { name: "light", icon: "i-sun", next: "high contrast" },
+  { name: "contrast", icon: "i-adjust", next: "dark theme" },
+];
+
+function initTheme(background) {
+  const button = document.getElementById("theme-toggle");
+  const iconRef = button?.querySelector("svg use");
+
+  function apply(name) {
+    const theme = THEMES.find((t) => t.name === name) || THEMES[0];
+    document.body.setAttribute("data-theme", theme.name);
+
+    if (iconRef) iconRef.setAttribute("href", `#${theme.icon}`);
+    if (button) {
+      const label = `Switch to ${theme.next}`;
+      button.title = label;
+      button.setAttribute("aria-label", label);
     }
 
-    // Resize event
-    window.addEventListener('resize', () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        init();
-    });
+    background?.refreshTheme();
+  }
 
-    // Start animation
-    init();
-    animate();
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    const themeIcon = themeToggleBtn.querySelector('i');
-    const body = document.body;
+  const saved = localStorage.getItem("theme");
+  apply(THEMES.some((t) => t.name === saved) ? saved : "atomic");
 
-    // Check for saved theme preference (Security: validate against whitelist)
-    const savedTheme = localStorage.getItem('theme') || 'atomic';
-    const validThemes = ['atomic', 'light', 'contrast'];
-    applyTheme(validThemes.includes(savedTheme) ? savedTheme : 'atomic');
+  button?.addEventListener("click", () => {
+    const current = document.body.getAttribute("data-theme");
+    const index = THEMES.findIndex((t) => t.name === current);
+    const next = THEMES[(index + 1) % THEMES.length];
+    apply(next.name);
+    localStorage.setItem("theme", next.name);
+  });
+}
 
-    themeToggleBtn.addEventListener('click', () => {
-        let currentTheme = body.getAttribute('data-theme');
-        let newTheme = 'atomic';
+/* ── Mobile navigation ────────────────────────────────────────────────── */
 
-        if (currentTheme === 'atomic') {
-            newTheme = 'light';
-        } else if (currentTheme === 'light') {
-            newTheme = 'contrast';
-        } else {
-            newTheme = 'atomic';
-        }
+function initNav() {
+  const hamburger = document.getElementById("hamburger");
+  const navLinks = document.querySelector(".nav-links");
+  if (!hamburger || !navLinks) return;
 
-        applyTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
-    });
+  const setOpen = (open) => {
+    navLinks.classList.toggle("active", open);
+    hamburger.setAttribute("aria-expanded", String(open));
+  };
 
-    // Mobile Menu Logic
-    const hamburger = document.getElementById('hamburger');
-    const navLinks = document.querySelector('.nav-links');
+  hamburger.addEventListener("click", () => {
+    setOpen(!navLinks.classList.contains("active"));
+  });
 
-    if (hamburger && navLinks) {
-        hamburger.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            hamburger.setAttribute('aria-expanded', navLinks.classList.contains('active'));
-        });
+  navLinks.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => setOpen(false));
+  });
 
-        // Close menu when clicking a link
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-                hamburger.setAttribute('aria-expanded', 'false');
-            });
-        });
-    }
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") setOpen(false);
+  });
+}
 
-    function applyTheme(theme) {
-        body.setAttribute('data-theme', theme);
+/* ── Boot ─────────────────────────────────────────────────────────────── */
 
-        // Update Icon
-        themeIcon.className = '';
-        if (theme === 'atomic') {
-            themeIcon.className = 'fas fa-moon';
-            themeToggleBtn.title = "Switch to Light Mode";
-        } else if (theme === 'light') {
-            themeIcon.className = 'fas fa-sun';
-            themeToggleBtn.title = "Switch to High Contrast";
-        } else {
-            themeIcon.className = 'fas fa-adjust';
-            themeToggleBtn.title = "Switch to Atomic Mode";
-        }
+document.addEventListener("DOMContentLoaded", () => {
+  const background = initBackground();
+  initTheme(background);
+  initNav();
+  initCvLink();
 
-        // Re-colour existing particles to match new theme (#4)
-        if (particlesArray) {
-            const color = getThemeParticleColor();
-            particlesArray.forEach(p => { p.color = color; });
-        }
-    }
+  const yearEl = document.getElementById("copyright-year");
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-    // Set copyright year dynamically (#13)
-    const yearEl = document.getElementById('copyright-year');
-    if (yearEl) yearEl.textContent = new Date().getFullYear();
+  // Pages without portfolio content (e.g. the cookie policy) simply skip this.
+  if (typeof portfolioData === "undefined") return;
 
-    // Load Content from Data Object (Synchronous, Security: validate before rendering)
-    if (typeof portfolioData !== 'undefined' && validatePortfolioData(portfolioData)) {
-        renderProfile(portfolioData.profile);
-        renderEducation(portfolioData.education);
-        renderProjects(portfolioData.projects);
-        renderExperience(portfolioData.experience);
-        renderPublications(portfolioData.publications);
-        renderActivities(portfolioData.activities);
-        renderSkills(portfolioData.skills);
-        renderCertificates(portfolioData.certificates);
-        renderTeaching(portfolioData.teaching);
-    } else {
-        console.error('Portfolio data not found or invalid. Ensure data.js is loaded correctly.');
-        document.getElementById('profile-name').textContent = 'Error Loading Portfolio';
-        document.getElementById('profile-bio').textContent = 'Unable to load portfolio data. Please refresh the page.';
-    }
+  if (!validatePortfolioData(portfolioData)) {
+    const name = document.getElementById("profile-name");
+    const bio = document.getElementById("profile-bio");
+    if (name) name.textContent = "Error Loading Portfolio";
+    if (bio)
+      bio.textContent =
+        "Unable to load portfolio data. Please refresh the page.";
+    return;
+  }
+
+  renderProfile(portfolioData.profile);
+  renderSections(portfolioData);
 });
-
-// Rendering Functions (Security: All user-controlled strings are HTML-escaped)
-function renderProfile(profile) {
-    document.getElementById('profile-name').textContent = profile.name;
-    document.getElementById('profile-titles').textContent = profile.titles;
-    document.getElementById('profile-bio').textContent = profile.bio;
-    document.getElementById('profile-avatar').src = profile.avatar;
-
-    const socialContainer = document.getElementById('social-links');
-    socialContainer.innerHTML = profile.social.map(link => `
-        <a href="${link.url}" class="social-icon" title="${escapeHtml(link.name)}" target="_blank" rel="noopener noreferrer"><i class="${link.icon}"></i></a>
-    `).join('');
-}
-
-function renderEducation(education) {
-    const container = document.getElementById('education-grid');
-    container.innerHTML = education.map(edu => `
-        <div class="card">
-            <h3>${escapeHtml(edu.degree)}</h3>
-            <h4>${escapeHtml(edu.institution)}</h4>
-            <div class="meta">${escapeHtml(edu.meta)}</div>
-            <p>${escapeHtml(edu.description)}</p>
-        </div>
-    `).join('');
-}
-
-function renderProjects(projects) {
-    const container = document.getElementById('projects-grid');
-    container.innerHTML = projects.map(project => `
-            <a href="${project.url}" target="_blank" rel="noopener noreferrer" class="card">
-                <h3>${escapeHtml(project.name)}</h3>
-                <div class="meta">${escapeHtml(project.meta)}</div>
-                <p>${escapeHtml(project.description)}</p>
-                ${project.tags.length ? `
-                <div class="skills-list card-tag-row">
-                    ${project.tags.map(tag => `<span class="skill-tag skill-tag--sm">${escapeHtml(tag)}</span>`).join('')}
-                </div>` : ''}
-            </a>
-    `).join('');
-}
-
-function renderExperience(experience) {
-    const container = document.getElementById('experience-grid');
-    container.innerHTML = experience.map(exp => `
-        <article class="card">
-            <h3>${escapeHtml(exp.role)}</h3>
-            <h4>${escapeHtml(exp.company)}</h4>
-            <div class="meta">${escapeHtml(exp.period)}</div>
-            <ul>
-                ${exp.details.map(detail => `<li>${escapeHtml(detail)}</li>`).join('')}
-            </ul>
-        </article>
-    `).join('');
-}
-
-function renderPublications(publications) {
-    const container = document.getElementById('publications-grid');
-    container.innerHTML = publications.map(pub => {
-        const isPresentation = pub.type === 'presentation';
-        const linkIcon = isPresentation ? 'fas fa-file-powerpoint' : 'fas fa-external-link-alt';
-        const badge = isPresentation
-            ? `<span class="pub-badge pub-badge--presentation"><i class="fas fa-chalkboard-teacher"></i> Presentation</span>`
-            : `<span class="pub-badge pub-badge--journal"><i class="fas fa-book-open"></i> Journal</span>`;
-        return `
-        <a href="${pub.url}" target="_blank" rel="noopener noreferrer" class="card card--link${isPresentation ? ' card--presentation' : ''}">
-            <div class="pub-badge-row">${badge}</div>
-            <h3>${escapeHtml(pub.title)} <i class="${linkIcon} card-ext-icon"></i></h3>
-            <div class="meta">${escapeHtml(pub.meta)}</div>
-            <p>${escapeHtml(pub.authors)}</p>
-            ${pub.description ? `<p>${escapeHtml(pub.description)}</p>` : ''}
-        </a>`;
-    }).join('');
-}
-
-function renderActivities(activities) {
-    const container = document.getElementById('activities-grid');
-    container.innerHTML = activities.map(act => `
-        <div class="card">
-            <h3>${escapeHtml(act.title)}</h3>
-            <div class="meta">${escapeHtml(act.meta)}</div>
-            <p>${escapeHtml(act.description)}</p>
-        </div>
-    `).join('');
-}
-
-function renderSkills(skills) {
-    const container = document.getElementById('skills-grid');
-    const skillCategories = [
-        { title: 'Languages & Packages', data: skills.languages, type: 'tags' },
-        { title: 'ML Tools', data: skills.ml_tools, type: 'tags' },
-        { title: 'Numerical Techniques', data: skills.numerical, type: 'list' },
-        { title: 'Cloud & Tools', data: skills.cloud, type: 'list' }
-    ];
-
-    container.innerHTML = skillCategories.map(cat => `
-        <div class="card">
-            <h3>${escapeHtml(cat.title)}</h3>
-            <ul class="${cat.type === 'tags' ? 'skills-list' : ''}">
-                ${cat.data.map(item =>
-                    cat.type === 'tags'
-                        ? `<li class="skill-tag">${escapeHtml(item)}</li>`
-                        : `<li>${escapeHtml(item)}</li>`
-                ).join('')}
-            </ul>
-        </div>
-    `).join('');
-}
-
-function renderCertificates(certificates) {
-    const container = document.getElementById('certificates-grid');
-    container.innerHTML = certificates.map(cert => `
-        <a href="${cert.url}" target="_blank" rel="noopener noreferrer" class="card card--link">
-            <h3><i class="${escapeHtml(cert.icon)} card-icon"></i>${escapeHtml(cert.title)}</h3>
-            <div class="meta">${escapeHtml(cert.issuer)}</div>
-            <p>${escapeHtml(cert.description)}</p>
-            <p class="card-view-link">View Certificate <i class="fas fa-external-link-alt card-ext-icon"></i></p>
-        </a>
-    `).join('');
-}
-
-
-function renderTeaching(teaching) {
-    const container = document.getElementById('teaching-grid');
-    container.innerHTML = teaching.map(teach => `
-        <div class="card">
-            <h3>${escapeHtml(teach.role)}</h3>
-            <div class="meta">${escapeHtml(teach.institution)}</div>
-            <p>${escapeHtml(teach.description)}</p>
-        </div>
-    `).join('');
-}

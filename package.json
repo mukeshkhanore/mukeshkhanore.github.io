@@ -1,0 +1,28 @@
+{
+  "name": "mukeshkhanore-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal academic portfolio — static site served by GitHub Pages",
+  "license": "MIT",
+  "scripts": {
+    "serve": "python3 -m http.server 8000",
+    "icons": "node scripts/build-icons.js",
+    "prerender": "node scripts/prerender.js",
+    "build": "npm run icons && npm run prerender",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint:html": "html-validate index.html cookie-policy.html 404.html",
+    "integrity": "node scripts/check-integrity.js",
+    "sri": "node scripts/check-integrity.js --fix",
+    "test": "node scripts/render-smoke-test.js",
+    "check": "npm run format:check && npm run lint:html && node scripts/build-icons.js --check && node scripts/prerender.js --check && npm run integrity && npm test"
+  },
+  "devDependencies": {
+    "@fortawesome/fontawesome-free": "6.4.0",
+    "html-validate": "^8.24.2",
+    "prettier": "^3.3.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
