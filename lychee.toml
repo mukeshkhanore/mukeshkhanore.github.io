@@ -1,6 +1,6 @@
 max_retries = 3
 timeout = 20
-exclude_mail = true
+include_mail = false
 
 accept = [200, 203, 206, 429]
 
