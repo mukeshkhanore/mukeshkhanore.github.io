@@ -4,6 +4,10 @@
 // hand-corrected — regenerating from a PDF will overwrite the fixes below
 // (chemical subscripts, superscript exponents, degree abbreviations).
 const portfolioData = {
+  // Shown in the footer. A literal string rather than a build-time stamp:
+  // prerender --check compares committed output byte for byte, so a generated
+  // date would fail CI the moment the month rolled over. Bump it by hand.
+  lastUpdated: "August 2026",
   /*
    * Drives the JSON-LD that scripts/prerender.js writes into index.html — one
    * block holding a Person plus a ScholarlyArticle per publication. It has to
@@ -80,7 +84,7 @@ const portfolioData = {
     social: [
       {
         name: "Email",
-        icon: "fas fa-envelope",
+        icon: "fas fa-mail",
         url: "mailto:mukeshkhanore@gmail.com",
       },
       {
@@ -403,14 +407,6 @@ const portfolioData = {
       "Phonon and phase-diagram calculations",
       "Numerical methods and sparse linear algebra",
     ],
-    soft: [
-      "Team leadership",
-      "Stakeholder communication",
-      "Conference presentation",
-      "Scientific writing",
-      "Teaching and mentoring",
-      "Cross-disciplinary collaboration",
-    ],
   },
   certificates: [
     {
@@ -418,7 +414,7 @@ const portfolioData = {
       issuer: "NVIDIA Deep Learning Institute",
       description:
         "Covered practical deep learning techniques using modern neural network frameworks for real-world AI applications.",
-      icon: "fas fa-microchip",
+      icon: "fas fa-cpu",
       url: "https://learn.nvidia.com/certificates?id=Ppjc0iNlRJ2yiJdoVhOKgw",
     },
     {
@@ -426,7 +422,7 @@ const portfolioData = {
       issuer: "NVIDIA Deep Learning Institute",
       description:
         "Mastered GPU-accelerated computing using CUDA C++ for high-performance scientific and parallel programming.",
-      icon: "fas fa-microchip",
+      icon: "fas fa-cpu",
       url: "https://learn.nvidia.com/certificates?id=HuN3OyBJTzuQB_SFkWH_WA",
     },
     {

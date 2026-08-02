@@ -81,7 +81,8 @@ function render() {
 
   const api = vm.runInContext(
     "({ portfolioData, SECTION_SPECS, validatePortfolioData," +
-      " renderProfile, renderSections, renderResearch, renderPublicationsMeta })",
+      " renderProfile, renderSections, renderResearch, renderPublicationsMeta," +
+      " renderLastUpdated })",
     context,
   );
 
@@ -94,6 +95,7 @@ function render() {
   api.renderSections(api.portfolioData);
   api.renderResearch(api.portfolioData);
   api.renderPublicationsMeta(api.portfolioData.publications);
+  api.renderLastUpdated(api.portfolioData);
 
   return { nodes, api };
 }

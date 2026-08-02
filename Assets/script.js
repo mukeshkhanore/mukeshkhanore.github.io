@@ -41,20 +41,28 @@ function safeUrl(value) {
  * `npm run icons` after adding a new icon to data.js.
  */
 const ICON_IDS = new Set([
-  "adjust",
-  "bars",
-  "envelope",
-  "file-arrow-down",
+  "award",
+  "book-open",
+  "briefcase",
+  "contrast",
+  "cpu",
+  "download",
+  "external-link",
+  "flask-conical",
+  "folder-git-2",
   "github",
   "google",
   "graduation-cap",
   "link",
   "linkedin",
-  "microchip",
+  "mail",
+  "menu",
   "moon",
   "orcid",
+  "presentation",
   "researchgate",
   "sun",
+  "users",
 ]);
 
 /**
@@ -162,7 +170,7 @@ function renderCard(card) {
     : "";
 
   const footer = card.footer
-    ? `<p class="card-view-link">${esc(card.footer)} ${icon("fa-external-link-alt", "card-ext-icon")}</p>`
+    ? `<p class="card-view-link">${esc(card.footer)} ${icon("fa-external-link", "card-ext-icon")}</p>`
     : "";
 
   return (
@@ -179,7 +187,6 @@ const SKILL_CATEGORIES = [
   { title: "Programming", key: "programming", style: "pills" },
   { title: "Simulation & Tools", key: "simulation", style: "pills" },
   { title: "Research & Physics", key: "research", style: "pills" },
-  { title: "Soft Skills", key: "soft", style: "pills" },
 ];
 
 /**
@@ -222,47 +229,94 @@ const enDash = (s) => String(s ?? "").replace(/\s+-\s+/g, " – ");
  * experience is a chronology, and flattening both into the same grid was the
  * design problem this replaces.
  */
-/** Publication entries, shared by the homepage bibliography and research.html. */
-function renderBiblio(items, { limit } = {}) {
-  const list = [...items].sort(
-    (a, b) => Number(pubYear(b) || 0) - Number(pubYear(a) || 0),
-  );
-  const shown = limit ? list.slice(0, limit) : list;
-
+/**
+ * A dense row list: fixed-width rail, title and meta stacked in the middle, an
+ * external-link arrow on the right. One component, used by both publications
+ * and certificates, so the two sections read as the same kind of thing instead
+ * of as two different card grids with odd gaps in them.
+ *
+ * row: { rail, railIcon, title, meta, href, modifier }
+ */
+function renderEntryList(rows, listClass) {
   return (
-    `<ol class="biblio">` +
-    shown
-      .map((item) => {
-        const isTalk = item.type === "presentation";
-        const year = pubYear(item);
-        return (
-          `<li class="biblio-item${isTalk ? " biblio-item--talk" : ""}">` +
-          `<div class="biblio-year">${esc(year || "—")}</div>` +
-          `<div class="biblio-entry">` +
-          `<h3 class="biblio-title">` +
-          `<a href="${safeUrl(item.url)}" target="_blank" rel="noopener noreferrer">` +
-          `${esc(item.title)}${icon("fa-external-link-alt", "biblio-arrow")}</a></h3>` +
-          (item.authors
-            ? `<p class="biblio-authors">${esc(item.authors)}</p>`
-            : "") +
-          `<p class="biblio-venue">${esc(citation(item))}` +
-          `<span class="biblio-kind">${isTalk ? "presentation" : "journal"}</span></p>` +
-          (item.description
-            ? `<p class="biblio-note">${esc(item.description)}</p>`
-            : "") +
-          (item.doi
-            ? // Through safeUrl() like every other href, rather than relying on
-              // encodeURI plus a hardcoded prefix. That was safe, but it was the
-              // one link in the codebase not using the central helper — which
-              // made it the one most likely to be got wrong by a later edit.
-              `<p class="biblio-doi"><a href="${safeUrl(`https://doi.org/${item.doi}`)}"` +
-              ` target="_blank" rel="noopener noreferrer">doi:${esc(item.doi)}</a></p>`
-            : "") +
-          `</div></li>`
-        );
+    `<ul class="entry-list ${listClass}">` +
+    rows
+      .map((row) => {
+        const inner =
+          `<div class="entry-rail">` +
+          (row.railIcon
+            ? icon(row.railIcon, "entry-rail-icon")
+            : esc(row.rail || "")) +
+          `</div>` +
+          `<div class="entry-main">` +
+          `<p class="entry-title">${esc(row.title)}</p>` +
+          (row.meta ? `<p class="entry-meta">${esc(row.meta)}</p>` : "") +
+          `</div>` +
+          (row.href ? icon("fa-external-link", "entry-arrow") : "");
+        const cls = `entry-row${row.modifier ? " " + row.modifier : ""}`;
+        return row.href
+          ? `<li class="${cls}"><a class="entry-link" href="${safeUrl(row.href)}"` +
+              ` target="_blank" rel="noopener noreferrer">${inner}</a></li>`
+          : `<li class="${cls}">${inner}</li>`;
       })
       .join("") +
-    `</ol>`
+    `</ul>`
+  );
+}
+
+/** Newest first. Stable, so two entries sharing a year keep data.js order. */
+const byYearDesc = (items) =>
+  [...items].sort((a, b) => Number(pubYear(b) || 0) - Number(pubYear(a) || 0));
+
+/**
+ * The newest publication, given the weight it deserves on an academic page:
+ * full width, accent border, its own call to action. Everything else becomes a
+ * row in the list below it.
+ */
+function renderFeaturedPublication(item) {
+  const isTalk = item.type === "presentation";
+  return (
+    `<article class="pub-featured">` +
+    `<p class="pub-pill">Latest</p>` +
+    `<h3 class="pub-featured-title">${esc(item.title)}</h3>` +
+    (item.authors
+      ? `<p class="pub-featured-authors">${esc(item.authors)}</p>`
+      : "") +
+    `<p class="pub-featured-venue">${esc(citation(item))}` +
+    `<span class="biblio-kind">${isTalk ? "presentation" : "journal"}</span></p>` +
+    (item.description
+      ? `<p class="pub-featured-note">${esc(item.description)}</p>`
+      : "") +
+    `<p class="pub-featured-cta"><a class="btn btn--primary" href="${safeUrl(item.url)}"` +
+    ` target="_blank" rel="noopener noreferrer">Read the paper</a></p>` +
+    `</article>`
+  );
+}
+
+/** Publication rows: year in the rail, authors and venue on one line. */
+function publicationRows(items) {
+  return items.map((item) => ({
+    rail: pubYear(item) || "—",
+    title: item.title,
+    meta: [item.authors, citation(item)].filter(Boolean).join(" · "),
+    href: item.url,
+    modifier: item.type === "presentation" ? "entry-row--talk" : "",
+  }));
+}
+
+/**
+ * Publications: one featured entry plus a list. `featured: false` gives the
+ * plain list, which is what research.html's short selection uses.
+ */
+function renderBiblio(items, { limit, featured = false } = {}) {
+  const list = byYearDesc(items);
+  const shown = limit ? list.slice(0, limit) : list;
+  if (!featured || shown.length < 2) {
+    return renderEntryList(publicationRows(shown), "entry-list--pub");
+  }
+  return (
+    renderFeaturedPublication(shown[0]) +
+    renderEntryList(publicationRows(shown.slice(1)), "entry-list--pub")
   );
 }
 
@@ -274,7 +328,7 @@ const SECTION_SPECS = {
      * file stays a plain curated list. A year rail running 2025, 2022, 2026
      * reads as a rendering bug, so display order has to match the device.
      */
-    render: renderBiblio,
+    render: (items) => renderBiblio(items, { featured: true }),
   },
 
   experience: {
@@ -346,14 +400,18 @@ const SECTION_SPECS = {
 
   certificates: {
     grid: "certificates-grid",
-    card: (item) => ({
-      href: item.url,
-      titleIconLeading: item.icon,
-      title: item.title,
-      meta: item.issuer,
-      body: [item.description],
-      footer: "View certificate",
-    }),
+    // The same row list as publications. Three certificates in a two-up grid
+    // left a permanently empty cell; a list has no such thing.
+    render: (items) =>
+      renderEntryList(
+        items.map((item) => ({
+          railIcon: item.icon,
+          title: item.title,
+          meta: item.issuer,
+          href: item.url,
+        })),
+        "entry-list--cert",
+      ),
   },
 
   activities: {
@@ -463,6 +521,13 @@ function renderPublicationsMeta(publications) {
     ? ` · ${Math.min(...years)}–${Math.max(...years)}`
     : "";
   el.textContent = `${count} ${noun}${span}`;
+}
+
+/** Footer stamp. The value is a literal in data.js — see the note there. */
+function renderLastUpdated(data) {
+  const el = document.getElementById("last-updated");
+  if (el && data.lastUpdated)
+    el.textContent = `Last updated: ${data.lastUpdated}`;
 }
 
 function renderProfile(profile) {
@@ -1012,6 +1077,40 @@ function initBackground() {
   };
 }
 
+/**
+ * Fades the lattice out as you leave the hero.
+ *
+ * The mask in style.css already softens its bottom edge; this handles the
+ * scroll axis, so the field is at full strength behind the hero and down to a
+ * quarter of that over the text sections, where it is competing with reading.
+ *
+ * rAF-throttled: a scroll handler that writes to style on every event fires
+ * far more often than the compositor can use.
+ */
+function initBackgroundFade() {
+  const canvas = document.getElementById("bg-canvas");
+  if (!canvas) return;
+
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    const travel = window.innerHeight * 0.9;
+    const progress = Math.min(1, window.scrollY / travel);
+    canvas.style.opacity = String(1 - progress * 0.75);
+  };
+
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    },
+    { passive: true },
+  );
+  update();
+}
+
 /* ── Background settings panel ────────────────────────────────────────── */
 
 /*
@@ -1028,16 +1127,9 @@ function initBackgroundPanel(background) {
 
   const panel = document.createElement("div");
   panel.className = "fx-panel";
+  panel.hidden = true;
   panel.innerHTML =
-    `<button type="button" class="fx-panel-toggle" aria-expanded="false"` +
-    ` aria-controls="fx-panel-body" aria-label="Background animation settings"` +
-    ` title="Background animation settings">` +
-    `<svg viewBox="0 0 24 24" class="fx-panel-icon" aria-hidden="true">` +
-    `<path fill="currentColor" d="M4 7h9v2H4V7zm13 0h3v2h-3V7zM4 15h3v2H4v-2zm7 0h9v2h-9v-2z"/>` +
-    `<circle cx="15" cy="8" r="2.6" fill="none" stroke="currentColor" stroke-width="1.6"/>` +
-    `<circle cx="9" cy="16" r="2.6" fill="none" stroke="currentColor" stroke-width="1.6"/>` +
-    `</svg></button>` +
-    `<div class="fx-panel-body" id="fx-panel-body" hidden>` +
+    `<div class="fx-panel-body">` +
     `<p class="fx-panel-title">Background</p>` +
     `<label class="fx-field" for="fx-density">Density` +
     `<input type="range" id="fx-density" min="20" max="120" step="1"></label>` +
@@ -1048,11 +1140,10 @@ function initBackgroundPanel(background) {
     `<label class="fx-check" for="fx-autotune">` +
     `<input type="checkbox" id="fx-autotune">Auto-tune</label>` +
     `<button type="button" class="fx-reset" id="fx-reset">Reset to defaults</button>` +
+    `<p class="fx-panel-hint">Shift + P to close</p>` +
     `</div>`;
   document.body.appendChild(panel);
 
-  const toggle = panel.querySelector(".fx-panel-toggle");
-  const body = panel.querySelector(".fx-panel-body");
   const density = panel.querySelector("#fx-density");
   const speed = panel.querySelector("#fx-speed");
   const lines = panel.querySelector("#fx-lines");
@@ -1066,10 +1157,31 @@ function initBackgroundPanel(background) {
   };
   sync();
 
-  toggle.addEventListener("click", () => {
-    const open = body.hidden;
-    body.hidden = !open;
-    toggle.setAttribute("aria-expanded", String(open));
+  const setOpen = (open) => {
+    panel.hidden = !open;
+    if (open) density.focus();
+  };
+
+  /*
+   * No gear button. The defaults are good, so the panel is for the rare
+   * visitor who wants to turn the motion down — not a control surface parked
+   * on top of the content. Shift + P reveals it.
+   */
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !panel.hidden) {
+      setOpen(false);
+      return;
+    }
+    // Never steal the key while someone is typing.
+    const el = event.target;
+    const tag = el && el.tagName ? el.tagName.toLowerCase() : "";
+    if (tag === "input" || tag === "textarea" || tag === "select") return;
+    if (el && el.isContentEditable) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    if (event.shiftKey && (event.key === "P" || event.key === "p")) {
+      event.preventDefault();
+      setOpen(panel.hidden);
+    }
   });
 
   const commit = () => {
@@ -1098,14 +1210,6 @@ function initBackgroundPanel(background) {
     Object.assign(settings, PARTICLE_DEFAULTS);
     sync();
     commit();
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !body.hidden) {
-      body.hidden = true;
-      toggle.setAttribute("aria-expanded", "false");
-      toggle.focus();
-    }
   });
 }
 
@@ -1142,7 +1246,7 @@ function initCvLink() {
 const THEMES = [
   { name: "atomic", icon: "i-moon", next: "light theme" },
   { name: "light", icon: "i-sun", next: "high contrast" },
-  { name: "contrast", icon: "i-adjust", next: "dark theme" },
+  { name: "contrast", icon: "i-contrast", next: "dark theme" },
 ];
 
 function initTheme(background) {
@@ -1284,6 +1388,7 @@ function initScrollSpy() {
 document.addEventListener("DOMContentLoaded", () => {
   const background = initBackground();
   initBackgroundPanel(background);
+  initBackgroundFade();
   initTheme(background);
   initNav();
   initCvLink();
@@ -1308,5 +1413,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderProfile(portfolioData.profile);
   renderSections(portfolioData);
   renderPublicationsMeta(portfolioData.publications);
+  renderLastUpdated(portfolioData);
   renderResearch(portfolioData);
 });

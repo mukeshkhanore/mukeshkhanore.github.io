@@ -114,8 +114,11 @@ for (const [key, spec] of Object.entries(api.SECTION_SPECS)) {
 
   // Sections with a `render` override are not card-shaped — publications are a
   // bibliography, experience a chronology — so count their own top-level rows.
+  // Publications and certificates are dense row lists now, not card grids;
+  // publications also lead with one featured entry outside the list.
   const ROW = {
-    publications: /<li class="biblio-item/g,
+    publications: /<li class="entry-row|<article class="pub-featured"/g,
+    certificates: /<li class="entry-row/g,
     experience: /<li class="timeline-item/g,
     education: /<li class="edu-item/g,
   };
@@ -150,7 +153,7 @@ for (const [key, spec] of Object.entries(api.SECTION_SPECS)) {
 for (const [id, pattern, expected] of [
   ["focus-grid", /<article class="focus-card"/g, data.research.focus.length],
   ["methods-grid", /<li class="skill-tag"/g, data.research.methods.length],
-  ["selected-publications", /<li class="biblio-item/g, 4],
+  ["selected-publications", /<li class="entry-row/g, 4],
 ]) {
   const html = grids.get(id) ? grids.get(id).innerHTML : "";
   const rendered = (html.match(pattern) || []).length;

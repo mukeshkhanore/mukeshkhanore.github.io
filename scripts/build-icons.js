@@ -24,6 +24,7 @@ const path = require("path");
 const ROOT = path.join(__dirname, "..");
 const CHECK = process.argv.includes("--check");
 const PKG = path.join(ROOT, "node_modules/@fortawesome/fontawesome-free/svgs");
+const LUCIDE = path.join(ROOT, "node_modules/lucide-static/icons");
 
 // FontAwesome 5 names still used in this codebase. FA6 renamed the files but
 // kept the old names as aliases, so the source keeps reading naturally.
@@ -59,6 +60,14 @@ const PATTERNS = [
   /\b(?:fab|fas|far)\s+fa-([a-z0-9-]+)/g,
   /href="#i-([a-z0-9-]+)"/g,
   /icon:\s*"i-([a-z0-9-]+)"/g,
+  /*
+   * script.js calls icon("fa-external-link-alt") with no style prefix. The
+   * first pattern requires fab/fas/far, so those calls were invisible to this
+   * scan: the glyph was pruned from the sprite and from ICON_IDS, and icon()
+   * silently fell back to #i-link. Every external-link arrow on the site was
+   * rendering as a chain-link glyph.
+   */
+  /icon\(\s*"fa-([a-z0-9-]+)"/g,
 ];
 
 // icon() falls back to this when handed a name it does not recognise, so it
@@ -74,7 +83,11 @@ const ALWAYS = ["link"];
  */
 function stripGenerated(src) {
   let out = src.replace(/<svg[^>]*class="icon-sprite"[\s\S]*?<\/svg>/g, "");
-  const openGrid = /<div[^>]*\bid="[a-z-]+-grid"[^>]*>/g;
+  // Not just *-grid: research.html fills #selected-publications too, and a
+  // region left unstripped feeds its own pre-rendered <use href="#i-…">
+  // back into the scan, which is how a retired icon stayed alive.
+  const openGrid =
+    /<div[^>]*\bid="(?:[a-z-]+-grid|selected-publications)"[^>]*>/g;
   let m;
   while ((m = openGrid.exec(out)) !== null) {
     const start = m.index + m[0].length;
@@ -129,11 +142,31 @@ const missing = [];
 // a bare sprite id does not have to remember whether it is solid or brands.
 const STYLES = ["solid", "brands", "regular"];
 
+/*
+ * Lucide first, FontAwesome as the fallback.
+ *
+ * Resolution is by availability rather than a hand-kept registry: every UI
+ * glyph this site uses exists in Lucide, and the five that do not — github,
+ * linkedin, orcid, researchgate, google — are brand logos, which Lucide
+ * deliberately does not ship. So FontAwesome is now the brands-only source and
+ * the rest of the set is Lucide, without either list being written down twice.
+ *
+ * The two draw differently: FontAwesome is filled, Lucide is stroked. Each
+ * symbol therefore carries its own paint attributes, and .icon in style.css
+ * only sizes — otherwise a CSS `fill` would flood the stroke icons solid.
+ */
+const LUCIDE_ATTRS =
+  'fill="none" stroke="currentColor" stroke-width="2"' +
+  ' stroke-linecap="round" stroke-linejoin="round"';
+
 for (const name of names) {
-  const filename = `${ALIAS[name] || name}.svg`;
-  const file = STYLES.map((s) => path.join(PKG, s, filename)).find((f) =>
-    fs.existsSync(f),
-  );
+  const lucideFile = path.join(LUCIDE, `${name}.svg`);
+  const isLucide = fs.existsSync(lucideFile);
+  const file = isLucide
+    ? lucideFile
+    : STYLES.map((s) => path.join(PKG, s, `${ALIAS[name] || name}.svg`)).find(
+        (f) => fs.existsSync(f),
+      );
   if (!file) {
     missing.push(name);
     continue;
@@ -144,7 +177,10 @@ for (const name of names) {
     .exec(src)[1]
     .replace(/<!--[\s\S]*?-->/g, "")
     .trim();
-  symbols.push(`<symbol id="i-${name}" viewBox="${viewBox}">${body}</symbol>`);
+  const attrs = isLucide ? LUCIDE_ATTRS : 'fill="currentColor"';
+  symbols.push(
+    `<symbol id="i-${name}" viewBox="${viewBox}" ${attrs}>${body}</symbol>`,
+  );
 }
 
 if (missing.length) {
@@ -168,27 +204,81 @@ const rendered =
   names.map((n) => `  "${n}",`).join("\n") +
   "\n]);";
 
+/* ── the sprite inlined in every page must match it too ───────────────── */
+
+/*
+ * This is the one that actually ships. Assets/icons.svg is generated and
+ * committed but nothing loads it — each page carries its own inlined copy, and
+ * until now that copy was maintained by hand. The two drifted: the file held
+ * 14 symbols while every page still inlined 18, four of them for icons no
+ * longer referenced anywhere. --check compared the generated file against
+ * itself and so never noticed.
+ */
+const HTML_SOURCES = SOURCES.filter((f) => f.endsWith(".html"));
+const SPRITE_TAG = /<svg[^>]*class="icon-sprite"[\s\S]*?<\/svg>/;
+
+function withSprite(src) {
+  if (!SPRITE_TAG.test(src)) return null;
+  return src.replace(SPRITE_TAG, sprite.trimEnd());
+}
+
 const spritePath = path.join(ROOT, "Assets/icons.svg");
 const spriteStale =
   !fs.existsSync(spritePath) || fs.readFileSync(spritePath, "utf8") !== sprite;
 const listStale = !listBlock.test(script) || !script.includes(rendered);
 
-if (CHECK) {
-  if (spriteStale || listStale) {
-    console.error("Icon sprite is stale. Run `npm run icons`.");
-    if (spriteStale) console.error("  - Assets/icons.svg differs");
-    if (listStale) console.error("  - ICON_IDS in Assets/script.js differs");
-    process.exit(1);
+(async () => {
+  const prettier = require("prettier");
+  const stalePages = [];
+  const writes = [];
+
+  for (const rel of HTML_SOURCES) {
+    const file = path.join(ROOT, rel);
+    if (!fs.existsSync(file)) continue;
+    const current = fs.readFileSync(file, "utf8");
+    const injected = withSprite(current);
+    if (injected === null) {
+      console.error(`${rel}: no <svg class="icon-sprite"> to update`);
+      process.exit(1);
+    }
+    // Formatted here so --check can compare byte for byte, the same way
+    // prerender.js does — and so pages it does not pre-render stay canonical.
+    const options = await prettier.resolveConfig(file);
+    const formatted = await prettier.format(injected, {
+      ...options,
+      filepath: file,
+    });
+    if (formatted !== current) {
+      stalePages.push(rel);
+      writes.push([file, formatted]);
+    }
   }
-  console.log(`Icon sprite up to date (${names.length} icons).`);
-  process.exit(0);
-}
 
-fs.writeFileSync(spritePath, sprite);
-script = script.replace(listBlock, rendered);
-fs.writeFileSync(scriptPath, script);
+  if (CHECK) {
+    if (spriteStale || listStale || stalePages.length) {
+      console.error("Icon sprite is stale. Run `npm run icons`.");
+      if (spriteStale) console.error("  - Assets/icons.svg differs");
+      if (listStale) console.error("  - ICON_IDS in Assets/script.js differs");
+      for (const p of stalePages) {
+        console.error(`  - inlined sprite in ${p} differs`);
+      }
+      process.exit(1);
+    }
+    console.log(`Icon sprite up to date (${names.length} icons).`);
+    return;
+  }
 
-console.log(
-  `Wrote Assets/icons.svg — ${names.length} icons, ` +
-    `${(sprite.length / 1024).toFixed(1)}KB.`,
-);
+  fs.writeFileSync(spritePath, sprite);
+  script = script.replace(listBlock, rendered);
+  fs.writeFileSync(scriptPath, script);
+  for (const [file, body] of writes) fs.writeFileSync(file, body);
+
+  console.log(
+    `Wrote Assets/icons.svg — ${names.length} icons, ` +
+      `${(sprite.length / 1024).toFixed(1)}KB` +
+      (writes.length ? `; inlined into ${writes.length} page(s).` : "."),
+  );
+})().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
