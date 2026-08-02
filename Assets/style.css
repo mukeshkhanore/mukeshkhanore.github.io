@@ -19,7 +19,7 @@
 @font-face {
   font-family: "Inter";
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 400 600;
   font-display: swap;
   src: url("fonts/inter.woff2") format("woff2");
 }
@@ -27,7 +27,7 @@
 @font-face {
   font-family: "Space Grotesk";
   font-style: normal;
-  font-weight: 300 700;
+  font-weight: 600 700;
   font-display: swap;
   src: url("fonts/space-grotesk.woff2") format("woff2");
 }
@@ -693,13 +693,18 @@ footer {
   }
 }
 
+/*
+ * No max-width. This used to be capped at 1000px inside a 1048px container,
+ * so the hero sat 24px inboard of every section below it — a misalignment
+ * you cannot unsee once you notice it, and one the "one geometry for the
+ * whole page" note above is explicitly against. The container sets the width;
+ * surfaces fill it.
+ */
 .hero-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: var(--space-7);
-  max-width: 1000px;
-  margin: 0 auto;
   box-shadow: var(--shadow-rest);
 }
 
@@ -800,13 +805,20 @@ footer {
  * none of this.
  */
 .hero-bio {
-  max-width: var(--measure);
-  margin: var(--space-6) auto 0;
-  padding: var(--surface-pad);
+  /* Matches .hero-card exactly — same width, padding and radius — because the
+     two boxes sit directly on top of each other. The measure is applied to the
+     paragraphs instead, so the line length stays readable without the box
+     itself shrinking away from the one above it. */
+  margin-top: var(--space-5);
+  padding: var(--space-7);
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   color: var(--text-secondary);
+}
+
+.hero-bio p {
+  max-width: var(--measure);
 }
 
 .hero-bio p + p {
@@ -1652,6 +1664,7 @@ summary:focus-visible,
    */
   header,
   .hero-card,
+  .hero-bio,
   .card,
   .biblio-item,
   .timeline-item,
@@ -1662,6 +1675,7 @@ summary:focus-visible,
   }
 
   .hero-card,
+  .hero-bio,
   .card,
   .biblio-item,
   .timeline-item,
@@ -1674,7 +1688,8 @@ summary:focus-visible,
   }
 
   /* 48px of padding either side left ~190px of content on a 320px screen. */
-  .hero-card {
+  .hero-card,
+  .hero-bio {
     padding: var(--space-5);
   }
 
@@ -1704,6 +1719,7 @@ summary:focus-visible,
 
 @media (max-width: 480px) {
   .hero-card,
+  .hero-bio,
   .card,
   .biblio-item,
   .timeline-item,

@@ -251,7 +251,11 @@ function renderBiblio(items, { limit } = {}) {
             ? `<p class="biblio-note">${esc(item.description)}</p>`
             : "") +
           (item.doi
-            ? `<p class="biblio-doi"><a href="https://doi.org/${encodeURI(item.doi)}"` +
+            ? // Through safeUrl() like every other href, rather than relying on
+              // encodeURI plus a hardcoded prefix. That was safe, but it was the
+              // one link in the codebase not using the central helper — which
+              // made it the one most likely to be got wrong by a later edit.
+              `<p class="biblio-doi"><a href="${safeUrl(`https://doi.org/${item.doi}`)}"` +
               ` target="_blank" rel="noopener noreferrer">doi:${esc(item.doi)}</a></p>`
             : "") +
           `</div></li>`
@@ -527,7 +531,14 @@ const MAX_DPR = 1.5; // beyond this the fill rate costs more than it looks bette
 const SPACING_SPARSE = 150; // px, at density 20
 const SPACING_DENSE = 48; // px, at density 120
 const MAX_ATOMS = 800; // ceiling regardless of viewport size
-const BOND_BUCKETS = 6; // opacity steps; one stroke() per bucket, not per bond
+/*
+ * Opacity steps for the A–B bonds. Six was too coarse: thermal jitter carried a
+ * bond's strain across a bucket edge every second or so and its brightness
+ * jumped, which read as twinkling rather than motion. Sixteen puts the step at
+ * ~0.016 alpha — below the threshold where an eye can see the change — and
+ * still costs sixteen stroke() calls a frame instead of seven hundred.
+ */
+const BOND_BUCKETS = 16;
 const BOND_MIN = 0.08; // faintest A–B bond (fully stretched)
 const BOND_RANGE = 0.26; // added at full compression
 
@@ -624,6 +635,26 @@ function initBackground() {
   // point of the animation, so it is a real number the draw reads, not a flag.
   let order = 0;
   let transitionAt = null;
+  let ordered = false; // the transition has already played once
+
+  /*
+   * Animation phase, accumulated from frame deltas rather than derived from
+   * the absolute clock.
+   *
+   * It used to be `(now / 1000) * (speed / 65)`. Because `now` is page time —
+   * tens of thousands of milliseconds — nudging the speed slider rescaled the
+   * whole elapsed history at once and every atom jumped to a new point in its
+   * oscillation. Integrating the delta instead means a speed change alters the
+   * rate from here on and nothing moves discontinuously.
+   */
+  let phase = 0;
+  let lastNow = null;
+
+  // Identifies the geometry the current lattice was built for. build() assigns
+  // every atom a fresh random jitter phase, so calling it when nothing
+  // geometric changed makes the whole lattice jump — which is what dragging
+  // the speed slider used to do.
+  let builtFor = null;
 
   const linesOn = () => settings.showLines && !linesSuppressed;
 
@@ -638,7 +669,12 @@ function initBackground() {
    * middle of every cell. Spacing is solved from the atom budget rather than
    * fixed, so the density slider thins the crystal instead of cropping it.
    */
+  function geometryKey() {
+    return `${settings.density}|${width}|${height}|${atomCap}`;
+  }
+
   function build() {
+    builtFor = geometryKey();
     const budget = Math.min(MAX_ATOMS, atomCap);
     let s = spacingFor(settings.density);
 
@@ -811,21 +847,32 @@ function initBackground() {
     ctx.clearRect(0, 0, width, height);
     if (linesOn()) drawBonds();
 
-    ctx.globalAlpha = PARTICLE_ALPHA;
+    /*
+     * One path per species, not one per atom. Each atom used to get its own
+     * beginPath/fill — 368 fill() calls a frame, and fills are the costliest
+     * thing here. Batched, it is two. moveTo before each arc is required or
+     * consecutive circles get joined by a stray line.
+     */
     ctx.fillStyle = `rgb(${accent[0]}, ${accent[1]}, ${accent[2]})`;
+
+    ctx.globalAlpha = PARTICLE_ALPHA;
+    ctx.beginPath();
     for (const a of aSites) {
-      ctx.beginPath();
+      ctx.moveTo(a.x + a.r, a.y);
       ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
-      ctx.fill();
     }
-    // The displaced species is the one carrying the dipole, so it is the one
-    // that brightens as the order parameter rises.
+    ctx.fill();
+
+    // The displaced species carries the dipole, so it is the one that
+    // brightens as the order parameter rises.
     ctx.globalAlpha = PARTICLE_ALPHA * (0.7 + 0.3 * order);
+    ctx.beginPath();
     for (const b of bSites) {
-      ctx.beginPath();
+      ctx.moveTo(b.x + b.r, b.y);
       ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-      ctx.fill();
     }
+    ctx.fill();
+
     ctx.globalAlpha = 1;
   }
 
@@ -867,12 +914,22 @@ function initBackground() {
     animFrameId = requestAnimationFrame(loop);
     sampleFps(now);
 
-    // One orchestrated moment: the lattice sits above the transition for a
-    // beat after load, then every B-site slides off-centre together.
-    if (transitionAt === null) transitionAt = now + TRANSITION_DELAY;
-    order = easeInOut(clamp((now - transitionAt) / TRANSITION_MS, 0, 1));
+    // Clamped so a backgrounded tab, or a long paint, cannot resume with a
+    // single enormous step that snaps the whole lattice forward.
+    const dt = lastNow === null ? 0 : Math.min(now - lastNow, 50);
+    lastNow = now;
+    phase += (dt / 1000) * (settings.speed / PARTICLE_DEFAULTS.speed);
 
-    drawFrame((now / 1000) * (settings.speed / PARTICLE_DEFAULTS.speed));
+    // One orchestrated moment: the lattice sits above the transition for a
+    // beat after load, then every B-site slides off-centre together. It plays
+    // once — coming back to the tab should not re-run it.
+    if (!ordered) {
+      if (transitionAt === null) transitionAt = now + TRANSITION_DELAY;
+      order = easeInOut(clamp((now - transitionAt) / TRANSITION_MS, 0, 1));
+      if (order >= 1) ordered = true;
+    }
+
+    drawFrame(phase);
   }
 
   function stop() {
@@ -891,11 +948,13 @@ function initBackground() {
     stop();
     frames = 0;
     sampleStart = null;
+    lastNow = null; // first frame after a resume contributes no delta
     if (reduceMotion.matches) {
       order = 1;
-      drawFrame(0);
+      ordered = true;
+      drawFrame(phase);
     } else {
-      transitionAt = null;
+      if (!ordered) transitionAt = null;
       animFrameId = requestAnimationFrame(loop);
     }
   }
@@ -906,10 +965,12 @@ function initBackground() {
     // rather than keeping a cap inferred from the old one.
     linesSuppressed = false;
     atomCap = MAX_ATOMS;
-    build();
+    // Only relay the crystal if the geometry actually moved. Speed, bonds and
+    // auto-tune change how it is drawn, not where the atoms are.
+    if (geometryKey() !== builtFor) build();
     if (reduceMotion.matches) {
       order = 1;
-      drawFrame(0);
+      drawFrame(phase);
     }
   }
 
@@ -926,7 +987,7 @@ function initBackground() {
     resizeTimer = setTimeout(() => {
       resize();
       build();
-      if (reduceMotion.matches) drawFrame(0);
+      if (reduceMotion.matches) drawFrame(phase);
     }, 150);
   });
 
@@ -939,7 +1000,7 @@ function initBackground() {
     apply,
     refreshTheme() {
       accent = readAccentRgb();
-      if (reduceMotion.matches) drawFrame(0);
+      if (reduceMotion.matches) drawFrame(phase);
     },
     save() {
       try {

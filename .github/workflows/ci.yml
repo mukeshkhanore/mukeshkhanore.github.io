@@ -13,14 +13,20 @@ on:
 permissions:
   contents: read
 
+# Actions are pinned to commit SHAs, not tags. A tag like `v4` is mutable — if
+# it were ever repointed at malicious code, that code would run here with the
+# repository checked out. The trailing comment records which release each SHA
+# is, since a bare SHA tells you nothing. To update: resolve the tag to its
+# commit (`gh api repos/OWNER/REPO/git/ref/tags/vN`) and replace both.
+
 jobs:
   checks:
     name: Format, HTML, integrity
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 20
 
@@ -51,10 +57,10 @@ jobs:
     name: Link check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Check links
-        uses: lycheeverse/lychee-action@v2
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
           # --root-dir is required because 404.html links to "/" and
           # "/Assets/style.css". Those absolute paths are deliberate — GitHub
