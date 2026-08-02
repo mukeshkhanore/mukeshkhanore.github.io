@@ -6,7 +6,7 @@
     <!-- See index.html for notes on this policy. No inline scripts on this page. -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; script-src 'self' https://www.googletagmanager.com https://consent-eu.cookiefirst.com https://cdn.cookiefirst.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://www.google-analytics.com https://*.cookiefirst.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.cookiefirst.com; frame-src https://consent-eu.cookiefirst.com; upgrade-insecure-requests;"
+      content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; script-src 'self' https://www.googletagmanager.com https://consent-eu.cookiefirst.com https://cdn.cookiefirst.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://www.google-analytics.com https://*.cookiefirst.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.cookiefirst.com; frame-src https://consent-eu.cookiefirst.com; upgrade-insecure-requests;"
     />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
@@ -15,7 +15,7 @@
       name="description"
       content="Cookie policy for mukeshkhanore.github.io — which cookies are used, why, and how to manage your consent."
     />
-    <meta name="theme-color" content="#2c3e50" />
+    <meta name="theme-color" content="#0a0a0a" />
     <meta name="robots" content="noindex, follow" />
     <link
       rel="canonical"
@@ -28,16 +28,35 @@
     />
     <link rel="stylesheet" href="Assets/style.css" />
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Same-origin and subsetted, so the type is on the wire with the CSS
+         instead of two round trips behind a third-party stylesheet. -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500&amp;family=Source+Sans+3:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,600&amp;display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="Assets/fonts/inter.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="Assets/fonts/space-grotesk.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
 
-    <!-- Consent banner. Must load before analytics so no cookie is set first. -->
-    <script src="https://consent-eu.cookiefirst.com/sites/mukeshkhanore.github.io-8c8a1728-7075-4f89-a2cc-051c120599b0/consent.js"></script>
+    <!--
+      Consent banner. `defer` because this was a synchronous third-party
+      script in <head>: it blocked HTML parsing for ~376ms on every load.
+      Ordering still holds — analytics.js below runs during parsing and
+      sets every storage type to denied, so the safe default is in place
+      long before this banner or gtag.js can act on it. This is the
+      no-autoblock build, so the banner blocks nothing itself.
+    -->
+    <script
+      defer
+      src="https://consent-eu.cookiefirst.com/sites/mukeshkhanore.github.io-8c8a1728-7075-4f89-a2cc-051c120599b0/consent.js"
+    ></script>
     <script src="Assets/analytics.js"></script>
     <script
       async
@@ -143,10 +162,10 @@
         />
       </symbol>
     </svg>
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <!-- Decorative background animation -->
-    <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
     <header>
       <div class="container">

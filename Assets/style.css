@@ -1,31 +1,82 @@
+/*
+ * ── Self-hosted type ──────────────────────────────────────────────────────
+ *
+ * These replace the fonts.googleapis.com stylesheet, which was render-blocking
+ * on a third-party origin: 272ms before it even resolved, and only then could
+ * the browser begin fetching the font files themselves from a *second* origin
+ * (fonts.gstatic.com — another DNS lookup and TLS handshake). Self-hosting
+ * removes both origins from the critical path and from the CSP.
+ *
+ * One variable file per family covers every weight the site uses, subsetted to
+ * the characters that actually appear on it. latin-ext is not optional: author
+ * names in the publication list carry s-caron and c-acute (Janis, Klic), and
+ * the physics content uses superscript and subscript digits.
+ *
+ * Regenerate with the recipe in README.md if new characters appear — a glyph
+ * that is missing here falls back to the system font mid-word.
+ */
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("fonts/inter.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("fonts/space-grotesk.woff2") format("woff2");
+}
+
 :root {
-  /* Theme: Modern Professional (dark) — midnight ground, single teal accent */
-  --primary-color: #2c3e50; /* Midnight */
-  --secondary-color: #34495e; /* Asphalt */
-  --accent-color: #52d1b8; /* Teal, lifted to clear AA on midnight */
-  --accent-rgb: 82, 209, 184;
-  --accent-hover: #7fe0cc;
-
-  --text-primary: #ecf0f1; /* Clouds */
-  --text-secondary: #bdc3c7; /* Silver */
-  --border-color: #566d85; /* 2.05:1 — cards sit only 1.18:1 off the page,
-                              so the hairline has to carry the boundary */
-
-  --card-bg: rgba(52, 73, 94, 0.85);
-  --card-hover-shadow: 0 20px 40px -15px rgba(var(--accent-rgb), 0.25);
-
-  /* Typography */
-  --font-main:
-    "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Helvetica, Arial, sans-serif;
   /*
-   * One superfamily in three cuts. Serif, sans and mono share a skeleton,
-   * widths and vertical metrics, so mixing them inside a line does not shift
-   * the baseline — which three unrelated faces did.
+   * Theme: Ink & Coral — near-black ground, one coral accent.
+   *
+   * Hues are given in hsl() so hover and tint states are derived by moving
+   * lightness on a single hue rather than hand-picking a second hex that
+   * drifts out of step. hsl(12 100% 67.5%) is exactly #ff7a59; every coral
+   * surface below is that hue at a different lightness or alpha.
    */
-  --font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
-  --font-mono:
-    "Source Code Pro", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --primary-color: #0a0a0a; /* Ink — page ground */
+  --secondary-color: #1a1a1a; /* Raised surface */
+  --accent-color: hsl(
+    12 100% 67.5%
+  ); /* #ff7a59 — 7.7:1 on ink, 6.8:1 on a card */
+  --accent-rgb: 255, 122, 89;
+  --accent-hover: hsl(12 100% 76%);
+  --accent-muted: hsl(12 100% 67.5% / 0.12);
+
+  --text-primary: #fafafa; /* Off-white — 19.0:1 on ink */
+  --text-secondary: #a0a0a0; /* Muted grey — 7.6:1 on ink */
+  /* Translucent rather than a flat grey, so the hairline sits correctly on
+     both the page ground and the lighter card it borders. The surface lift is
+     only #1a1a1a over #0a0a0a, so this is what actually draws the edge. */
+  --border-color: rgba(255, 255, 255, 0.08);
+
+  --card-bg: #1a1a1a;
+  /* Stand-in for the blurred surfaces on phones, where backdrop-filter on two
+     dozen elements is a real cost on a phone; the surfaces are already opaque
+     here, so this is simply the same colour. */
+  --card-bg-solid: #1a1a1a;
+  --card-hover-shadow: 0 18px 40px -18px rgba(var(--accent-rgb), 0.35);
+
+  /* Typography: two families. Space Grotesk for anything structural, Inter
+     for anything you read at length. */
+  --font-main:
+    Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  /*
+   * System mono, no third webfont. It sets the year rails and citation lines;
+   * an explicit line-height keeps them on the baseline of the title beside
+   * them, so the shared-metrics trick the old superfamily relied on is no
+   * longer load-bearing.
+   */
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
 
   /* Type scale. Five steps, deliberately far apart: the previous design had
      nine sizes between 0.8 and 1.0rem, which read as inconsistency rather
@@ -53,12 +104,13 @@
   --rail: 12rem; /* 192px — holds "Aug 2013 – Aug 2019" at 15px mono
      without wrapping, which the baseline alignment below depends on */
   --surface-pad: var(--space-5); /* 24px */
-  --radius: 12px;
+  --radius: 14px; /* cards and buttons; 16px on the hero card */
+  --radius-lg: 16px;
 
-  /* Surfaces sit only ~1.15:1 above the page, which is normal; the resting
-     shadow is what separates them, not the tone. */
-  --shadow-rest:
-    0 1px 2px rgba(0, 0, 0, 0.25), 0 6px 16px -8px rgba(0, 0, 0, 0.4);
+  /* On ink, a shadow does almost nothing — #1a1a1a over #0a0a0a is what
+     separates a card, helped by the hairline border. The shadow is kept only
+     so the hover lift has somewhere to travel. */
+  --shadow-rest: 0 1px 2px rgba(0, 0, 0, 0.5);
 
   /*
    * Spacing scale on a 4px grid. Before this there were three tokens and
@@ -74,43 +126,67 @@
   --space-7: 3rem; /* 48px */
   --space-8: 5rem; /* 80px */
 
-  /* Shadows */
-  --shadow-lg:
-    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-
-  --header-bg: rgba(44, 62, 80, 0.9);
-  --overlay-bg: rgba(44, 62, 80, 0.97);
-  /* Veil for meta pills and card sheen. Light on a dark ground, dark on a
+  --header-bg: rgba(10, 10, 10, 0.82);
+  --overlay-bg: rgba(10, 10, 10, 0.98);
+  /* Veil for meta pills and tag chips. Light on a dark ground, dark on a
      light one — a white veil is invisible on paper. */
-  --overlay-tint: rgba(255, 255, 255, 0.07);
-  /* Second mark, for presentations. This palette has no second hue, so the
-     mark steps along the same grey ramp instead of introducing one. */
-  --mark-color: #bdc3c7;
+  --overlay-tint: rgba(255, 255, 255, 0.06);
+  /* Second mark, for presentations: coral desaturated rather than a new hue. */
+  --mark-color: hsl(12 30% 62%);
+
+  /* The gradient that replaced the particle canvas. Two very low-alpha coral
+     pools, top-right and bottom-left, over the ink — enough to keep the page
+     from reading as flat black, cheap enough to cost nothing to paint. */
+  --page-gradient:
+    radial-gradient(
+      60rem 40rem at 85% -10%,
+      hsl(12 100% 67.5% / 0.09),
+      transparent 60%
+    ),
+    radial-gradient(
+      50rem 40rem at 0% 100%,
+      hsl(12 100% 67.5% / 0.06),
+      transparent 60%
+    );
 }
 
-/* Light Theme: Modern Professional (monochrome) — no accent hue at all,
-   so links are distinguished by underline rather than colour. */
+/* Light theme: the same coral hue on paper. #ff7a59 itself is only 2.5:1 on
+   #fafafa — nowhere near readable — so the light theme darkens it down the
+   same hue rather than reusing the dark-theme value. Inline links still carry
+   an underline, so colour is never the only signal. */
 [data-theme="light"] {
-  --primary-color: #ecf0f1; /* Clouds */
+  --primary-color: #fafafa;
   --secondary-color: #ffffff;
-  --accent-color: #2c3e50; /* Midnight — the ink doubles as the accent */
-  --accent-rgb: 44, 62, 80;
-  --accent-hover: #16232e;
+  --accent-color: hsl(12 72% 40%); /* darkened to 5.8:1 on paper */
+  --accent-rgb: 175, 58, 29;
+  --accent-hover: hsl(12 72% 31%);
+  --accent-muted: hsl(12 72% 40% / 0.1);
 
-  --text-primary: #2c3e50;
-  --text-secondary: #5f6e6f; /* Asbestos darkened: #7F8C8D is 3.03:1, too
-                                light for body text */
-  --border-color: #9fa9ae; /* 2.09:1 */
+  --text-primary: #171717;
+  --text-secondary: #575757; /* 6.9:1 */
+  --border-color: #e0e0e0;
 
-  --card-bg: rgba(255, 255, 255, 0.9);
-  --card-hover-shadow: 0 20px 40px -15px rgba(var(--accent-rgb), 0.18);
+  --card-bg: #ffffff;
+  --card-bg-solid: #ffffff;
+  --card-hover-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.18);
 
-  --header-bg: rgba(236, 240, 241, 0.9);
-  --overlay-bg: rgba(236, 240, 241, 0.97);
-  --overlay-tint: rgba(44, 62, 80, 0.07);
-  --shadow-rest:
-    0 1px 2px rgba(27, 39, 51, 0.06), 0 6px 16px -8px rgba(27, 39, 51, 0.14);
-  --mark-color: #34495e;
+  --header-bg: rgba(250, 250, 250, 0.85);
+  --overlay-bg: rgba(250, 250, 250, 0.98);
+  --overlay-tint: rgba(23, 23, 23, 0.05);
+  --shadow-rest: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --mark-color: hsl(12 40% 45%);
+
+  --page-gradient:
+    radial-gradient(
+      60rem 40rem at 85% -10%,
+      hsl(12 72% 40% / 0.07),
+      transparent 60%
+    ),
+    radial-gradient(
+      50rem 40rem at 0% 100%,
+      hsl(12 72% 40% / 0.05),
+      transparent 60%
+    );
 }
 
 /* High Contrast Theme */
@@ -125,12 +201,16 @@
   --text-secondary: #ffffff;
   --border-color: #ffffff;
   --card-bg: #111111;
+  --card-bg-solid: #111111;
   --card-hover-shadow: 0 0 0 3px #ffff00;
   --header-bg: #000000;
   --overlay-bg: #000000;
+  --accent-muted: rgba(255, 255, 0, 0.15);
   --overlay-tint: rgba(255, 255, 255, 0.12);
-  /* High contrast separates surfaces with borders, not depth. */
+  /* High contrast separates surfaces with borders, not depth, and takes no
+     gradient — a tinted ground is exactly what this theme exists to avoid. */
   --shadow-rest: none;
+  --page-gradient: none;
 }
 
 * {
@@ -145,13 +225,27 @@
   word-wrap: break-word;
 }
 
+/*
+ * No `overflow-x: hidden` here. It was hiding two real bugs rather than
+ * fixing them — a nav that overflowed at every width above 768px, and the
+ * CookieFirst table running off the side of the cookie policy — and it clips
+ * anything that overflows in future instead of making it visible. The drawer
+ * at `right: -100%` is position: fixed, which contributes no scrollable
+ * overflow, so nothing needs the clip.
+ */
 body {
   font-family: var(--font-main);
   background-color: var(--primary-color);
+  /* Replaces the particle canvas: fixed so it does not scroll with content,
+     and free to paint compared with 120 animated particles plus a per-frame
+     O(n²) link pass. */
+  background-image: var(--page-gradient);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   color: var(--text-primary);
   font-size: var(--fs-body);
   line-height: var(--lh-body);
-  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
@@ -165,27 +259,60 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Button Style */
+/*
+ * Buttons. Two weights: a solid coral primary and an outlined ghost, so a
+ * pair of calls to action has an obvious first choice instead of two equals.
+ */
 .btn {
-  display: inline-block;
-  background: var(--accent-color);
-  color: var(--primary-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 44px;
   padding: var(--space-3) var(--space-5);
-  border-radius: 9999px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-size: var(--fs-meta);
   font-weight: 600;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-  border: none;
+  letter-spacing: 0.01em;
   cursor: pointer;
   text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
   text-decoration: none;
+}
+
+.btn--primary,
+.btn:not(.btn--ghost) {
+  background: var(--accent-color);
   color: var(--primary-color);
+}
+
+.btn--primary:hover,
+.btn:not(.btn--ghost):hover {
+  background: var(--accent-hover);
+  color: var(--primary-color);
+  box-shadow: 0 8px 20px -6px rgba(var(--accent-rgb), 0.45);
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.btn--ghost:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  background: var(--accent-muted);
 }
 
 /* Layout Utilities */
@@ -213,20 +340,43 @@ nav {
 }
 
 .logo {
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--fs-title);
+  letter-spacing: -0.02em;
   color: var(--text-primary);
 }
 
+/*
+ * Six links, down from ten — education, certificates, conferences and
+ * teaching are still full sections, just not in the header. At the body size
+ * with 32px gaps the old ten needed roughly 1160px inside a 1048px container
+ * and overflowed at every width, invisibly, because body used to clip it.
+ *
+ * Nav labels are chrome rather than reading text, so the meta size is right
+ * here; nothing outside the header changes size.
+ *
+ * flex-wrap is a safety net rather than a layout. The fallback stack sets
+ * wider than Inter and the webfont link uses display=swap, so first paint is
+ * wider than the arithmetic assumes. Two rows for the length of the swap
+ * beats a clipped nav.
+ */
 .nav-links {
   display: flex;
-  gap: var(--space-6);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
   list-style: none;
+  font-size: var(--fs-meta);
 }
 
 .nav-links a {
+  position: relative;
+  display: inline-block;
+  padding: var(--space-1) 0;
   color: var(--text-secondary);
   font-weight: 500;
+  transition: color 0.2s ease;
 }
 
 .nav-links a:hover {
@@ -234,7 +384,37 @@ nav {
   text-decoration: none;
 }
 
-/* Hamburger Menu */
+/*
+ * Scroll-spy state, set by initScrollSpy(). The underline is a pseudo-element
+ * rather than text-decoration so it can animate in from nothing and does not
+ * shift the text baseline when it appears.
+ */
+.nav-links a.is-active {
+  color: var(--text-primary);
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent-color);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+
+.nav-links a.is-active::after {
+  transform: scaleX(1);
+}
+
+/*
+ * Hamburger. Hidden until the nav collapses; the drawer query below turns it
+ * back on as inline-flex, which is what centres the glyph in the 44px box.
+ */
 .hamburger {
   display: none;
   background: none;
@@ -245,10 +425,59 @@ nav {
   padding: var(--space-2);
 }
 
-/* Mobile Navigation */
-@media (max-width: 768px) {
+/* WCAG 2.5.8 asks for 44px; icon plus padding came to 40px and 35px. */
+.hamburger,
+.theme-toggle {
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.theme-toggle {
+  display: inline-flex;
+}
+
+/*
+ * CV button in the header. Compact so it does not compete with the nav, and
+ * it ships `hidden` — initCvLink() reveals it and its hero twin together once
+ * a HEAD request confirms the PDF is actually there.
+ */
+.nav-cv {
+  min-height: 36px;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--fs-micro);
+  white-space: nowrap;
+}
+
+/* Below the drawer breakpoint the header holds only the logo, hamburger and
+   toggle; the CV button moves into the drawer, where 44px applies again. */
+@media (max-width: 767.98px) {
+  .nav-cv {
+    min-height: 44px;
+    font-size: var(--fs-meta);
+  }
+}
+
+/*
+ * Mobile navigation. One block, not two: the sibling rule that set
+ * `.theme-toggle { margin-left: auto }` used to live in its own query, so
+ * changing only this one would have left the toggle with its desktop margin
+ * while the hamburger claimed the free space, splaying the header apart.
+ *
+ * The breakpoint is mirrored in initNav() in script.js, which uses it to set
+ * `inert` on the closed drawer. Change one and you must change the other.
+ */
+@media (max-width: 767.98px) {
+  nav {
+    justify-content: space-between;
+  }
+
+  /* margin-left: auto takes all the free space, so the logo sits left and the
+     hamburger and toggle pair up on the right. The toggle carried an `auto`
+     of its own before, which split the gap and splayed the three apart. */
   .hamburger {
-    display: block;
+    display: inline-flex;
     margin-left: auto;
     margin-right: var(--space-4);
   }
@@ -258,13 +487,26 @@ nav {
     top: 0;
     right: -100%;
     height: 100vh;
+    /* iOS reports 100vh as the URL-bar-collapsed height, so the drawer runs
+       under the browser chrome until the bar hides. */
+    height: 100dvh;
     width: 70%;
     max-width: 300px;
+    padding: var(--space-8) var(--space-4) var(--space-6);
     background-color: var(--overlay-bg);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     flex-direction: column;
-    justify-content: center;
+    flex-wrap: nowrap;
+    /* Not `center`. Ten items need ~700px against a 667px phone viewport, and
+       centred overflow puts the first item permanently above the scroll
+       origin — unreachable no matter how far you scroll up. */
+    justify-content: flex-start;
     align-items: center;
+    gap: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    font-size: var(--fs-body);
     transition: right 0.3s ease-in-out;
     box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
     z-index: 99;
@@ -275,47 +517,43 @@ nav {
   }
 
   .nav-links li {
-    margin: var(--space-5) 0;
+    margin: var(--space-4) 0;
   }
 
   .nav-links a {
-    font-size: var(--fs-title);
+    font-size: var(--fs-lead);
   }
 }
 
+/* Set by initNav() while the drawer is open, so the page behind cannot scroll. */
+body.nav-open {
+  overflow: hidden;
+}
+
 /* Hero Section */
+/* The page gradient on <body> now carries the tint; the hero adds no ground
+   of its own, so the card is the only surface in it. */
 .hero {
   padding: var(--space-8) 0;
-  background:
-    radial-gradient(
-      circle at top right,
-      var(--secondary-color) 0%,
-      transparent 40%
-    ),
-    radial-gradient(
-      circle at bottom left,
-      var(--secondary-color) 0%,
-      transparent 40%
-    );
-  position: relative;
-  overflow: hidden;
-  /* Ensure particles don't spill out */
+  border-bottom: 1px solid var(--border-color);
 }
 
-/* Background Animation Canvas */
+/*
+ * The particle canvas. Transparent rather than filled, so the page gradient on
+ * <body> still shows through underneath it and the two layers compose.
+ * pointer-events: none keeps it from swallowing clicks, and it carries no
+ * tabindex, so it is skipped entirely by keyboard navigation.
+ */
 #bg-canvas {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
-  z-index: -1;
-  /* Behind everything */
+  z-index: 0;
   pointer-events: none;
-  background: var(--primary-color);
 }
 
-/* Ensure content sits above particles */
+/* Content sits above the canvas. */
 main,
 header,
 footer {
@@ -323,64 +561,219 @@ footer {
   z-index: 1;
 }
 
+/* ── Background settings panel ────────────────────────────────────────── */
+
+.fx-panel {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 90; /* under the header (100) and the nav drawer (99) */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.fx-panel-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  background: rgba(26, 26, 26, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.fx-panel-toggle:hover,
+.fx-panel-toggle[aria-expanded="true"] {
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.fx-panel-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.fx-panel-body {
+  width: 15rem;
+  padding: var(--space-4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background: rgba(26, 26, 26, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.fx-panel-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.fx-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: var(--fs-micro);
+  color: var(--text-primary);
+}
+
+.fx-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  font-size: var(--fs-micro);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+/* accent-color tints the native control, so the slider fill and the checkmark
+   pick up coral without rebuilding either from scratch. */
+.fx-field input[type="range"],
+.fx-check input[type="checkbox"] {
+  accent-color: var(--accent-color);
+  cursor: pointer;
+}
+
+.fx-field input[type="range"] {
+  width: 100%;
+  min-height: 24px;
+}
+
+.fx-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.fx-reset {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: var(--fs-micro);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.fx-reset:hover {
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+  background: var(--accent-muted);
+}
+
+/* On a phone the panel would sit on top of the content it is tuning. */
+@media (max-width: 480px) {
+  .fx-panel-body {
+    width: min(15rem, calc(100vw - var(--space-6)));
+  }
+}
+
 .hero-card {
   background-color: var(--card-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: var(--space-7);
-  /* Increased from 3rem 2rem */
   max-width: 1000px;
-  /* Increased from 900px */
   margin: 0 auto;
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-rest);
 }
 
 /*
  * The name leads. Every hero text block lives in one column, so the title,
  * statement, bio and buttons all align to the name's left edge — they used to
  * sit in two different containers, 172px apart.
+ *
+ * This is index.html's hero only, which has exactly two children: the avatar
+ * and .hero-text. It must NOT live on .hero-card. 404.html puts three blocks
+ * inside that surface and cookie-policy.html puts seventeen, so a flex row
+ * there turned the whole cookie policy into seventeen side-by-side strips at
+ * every width above the 640px stacking breakpoint.
  */
-.hero-card {
+.hero-split {
   display: flex;
   align-items: flex-start;
   gap: var(--space-6);
+}
+
+/*
+ * The flex item is <picture>, not the <img> inside it, so `flex: none` on
+ * .profile-photo never applied — the avatar column shrank below its fixed
+ * 140px and the image overflowed it between 641px and ~900px.
+ */
+.hero-split > picture {
+  flex: none;
 }
 
 .hero-text {
   max-width: var(--measure);
 }
 
+/*
+ * Three registers, not three sizes. The name is display type set large and
+ * tight; the tagline is the utility voice — mono, uppercase, letterspaced —
+ * and the summary is plain body text. Previously all three were the same two
+ * families at descending sizes, which gave the hero no tension at all.
+ */
 .hero h1 {
   font-family: var(--font-display);
-  font-size: clamp(2.25rem, 4.5vw, 3rem);
-  font-weight: 600;
-  line-height: var(--lh-tight);
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-  margin-bottom: var(--space-2);
-}
-
-#profile-titles {
-  font-size: var(--fs-body);
-  font-weight: 600;
-  color: var(--accent-color);
-  margin-bottom: var(--space-3);
-}
-
-.hero-statement {
-  font-size: var(--fs-title);
-  line-height: var(--lh-snug);
+  font-size: clamp(2.75rem, 6.5vw, 4.25rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
   color: var(--text-primary);
   margin-bottom: var(--space-4);
+}
+
+/* The utility register: the one coral line in the hero, and the only place on
+   the page where type is letterspaced this far open. */
+.hero-tagline {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  line-height: var(--lh-snug);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-color);
+  margin-bottom: var(--space-5);
+}
+
+.hero-summary {
+  font-size: var(--fs-lead);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+  max-width: var(--measure);
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-6);
+  gap: var(--space-3);
   margin-top: var(--space-6);
 }
 
@@ -388,21 +781,42 @@ footer {
   margin: 0;
 }
 
-.hero-cv .btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
+/*
+ * The long bio, below the card rather than inside it: three short paragraphs
+ * at reading measure, so the hero stays scannable and the detail is still one
+ * scroll away rather than hidden.
+ */
+/*
+ * Sits on its own surface rather than on the bare page ground.
+ *
+ * A particle is coral at 0.4 over ink, which composites to #6c3729, and
+ * --text-secondary on that measures 3.6:1 — under the 4.5:1 minimum, on
+ * moving pixels. Dimming the canvas globally does not fix it: a uniform scrim
+ * over the canvas is arithmetically the same as lowering particle alpha, so
+ * text contrast and particle visibility rise and fall together. The only way
+ * to keep the network bright AND the prose readable is to separate them in
+ * space — particles stay at full strength everywhere except directly behind
+ * text. Headings are #fafafa and measure 9:1 over a particle, so they need
+ * none of this.
+ */
+.hero-bio {
+  max-width: var(--measure);
+  margin: var(--space-6) auto 0;
+  padding: var(--surface-pad);
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
 }
 
-/* Specific styling for bio */
-#profile-bio {
-  font-size: var(--fs-lead);
-  line-height: var(--lh-body);
-  color: var(--text-primary);
+.hero-bio p + p {
+  margin-top: var(--space-4);
 }
 
 .social-links {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-4);
 }
 
@@ -436,6 +850,35 @@ section h2 {
   letter-spacing: -0.02em;
 }
 
+/*
+ * Publications are the credential on an academic page, not one section among
+ * nine. This is the only section that gets the larger heading and a rule, so
+ * the weight reads as rank rather than as decoration.
+ */
+.section--lead h2 {
+  font-size: clamp(2.25rem, 4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Count and span, derived from the list by renderPublicationsMeta(). */
+.section-eyebrow {
+  margin-bottom: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-color);
+}
+
+.section--lead .biblio-title {
+  font-size: 1.625rem;
+}
+
 /* Cards (Publications, Experience) */
 .card-grid {
   display: grid;
@@ -445,11 +888,8 @@ section h2 {
   /* Ensure cards stretch to same height */
 }
 
-/* Card Styling Improvements */
 .card {
   background-color: var(--card-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
   box-shadow: var(--shadow-rest);
@@ -465,18 +905,35 @@ section h2 {
   overflow: hidden;
 }
 
+/*
+ * The lift is reserved for cards that are actually links. Skills, conferences
+ * and teaching are plain <article>s, and lifting those advertises an
+ * interaction that does not exist — the same reason the skill tags lost their
+ * hover state. Everything still gets the border and heading colour on hover.
+ */
 .card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--card-hover-shadow);
   border-color: var(--accent-color);
 }
 
+.card--link:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--card-hover-shadow);
+}
+
 .card h3 {
-  color: var(--accent-color);
+  font-family: var(--font-display);
+  color: var(--text-primary);
   margin-bottom: var(--space-2);
   font-size: var(--fs-title);
   font-weight: 600;
   line-height: var(--lh-snug);
+  transition: color 0.2s ease;
+}
+
+/* Coral arrives on hover rather than sitting on every heading at rest — with
+   a title on all 23 cards it stopped reading as emphasis. */
+.card:hover h3 {
+  color: var(--accent-color);
 }
 
 .card .meta {
@@ -544,27 +1001,39 @@ section h2 {
  * project cards it made every tag twitch whenever the card was hovered.
  */
 
-/* Footer */
+/* Footer — the social links live here now, not in the hero. */
 footer {
   text-align: center;
   padding: var(--space-8) 0;
   color: var(--text-secondary);
   font-size: var(--fs-meta);
+  border-top: 1px solid var(--border-color);
+  /* Same reason as .hero-bio: this is --text-secondary on the bare ground.
+     A near-opaque band reads as a normal footer rather than as a card. */
+  background-color: var(--primary-color);
 }
 
-/* Profile Photo with Animation */
+footer .social-links {
+  margin-bottom: var(--space-5);
+}
+
+.footer-contact {
+  margin-bottom: var(--space-3);
+  font-family: var(--font-mono);
+}
+
+/*
+ * Square, not a circle. A 140px round headshot is the single most templated
+ * element on a portfolio page; the same photo in a square with a coral
+ * hairline reads as a document rather than a profile chip.
+ */
 .profile-photo {
   width: 140px;
   height: 140px;
-  border-radius: 50%;
+  border-radius: 4px;
   object-fit: cover;
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--accent-color);
   flex: none;
-  transition: border-color 0.2s ease;
-}
-
-.profile-photo:hover {
-  border-color: var(--accent-hover);
 }
 
 /* Theme Toggle Button */
@@ -585,47 +1054,37 @@ footer {
 /* Certificates Section */
 /* Uses standard card styles now */
 
-/* Responsive */
-@media (max-width: 768px) {
-  nav {
-    justify-content: space-between;
-  }
+/*
+ * ── Breakpoints ───────────────────────────────────────────────────────────
+ *
+ *    480px   surfaces drop to their tightest padding
+ *    640px   the year/period rails stack above their content; the hero stacks
+ *    768px   the card grid goes two-up, the nav collapses into the drawer
+ *            below it, and the blur comes off
+ *
+ * Stated as literals because custom properties are not allowed in a media
+ * condition and there is no CSS build step here. Upper bounds use the .98
+ * form so a max-width and a min-width query never both fire on the boundary.
+ *
+ * Anything overriding a surface (.card, .hero-card, .biblio-item and friends)
+ * belongs in the narrow-screen block at the very END of this file, not here.
+ * A media query carries no extra specificity, so an override written above a
+ * rule it means to beat silently loses to it.
+ */
 
-  .theme-toggle {
-    margin-left: auto;
-  }
-}
-
-/* Section-Specific Card Heights for Better Consistency */
-/* Removed specific overrides to ensure uniform card appearance */
-
-/* Responsive Grid Improvements */
 @media (min-width: 768px) {
   .card-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 767px) {
-  .card-grid {
-    grid-template-columns: 1fr;
-    /* Single column on mobile */
-  }
-
-  .card {
-    min-height: auto;
-    /* Remove min-height on mobile */
-    padding: var(--space-6);
-    /* Reduce padding on mobile */
-  }
-
+@media (max-width: 767.98px) {
   .hero p {
     font-size: var(--fs-body);
   }
 
   section {
     padding: var(--space-7) 0;
-    /* Reduce section padding on mobile */
   }
 }
 
@@ -721,9 +1180,14 @@ footer {
 
 /* Keyboard focus ring — the default is invisible against the dark theme. */
 a:focus-visible,
-button:focus-visible {
-  outline: 3px solid var(--accent-color);
-  outline-offset: 3px;
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
   border-radius: 4px;
 }
 
@@ -750,22 +1214,19 @@ button:focus-visible {
   display: none !important;
 }
 
-/* Two classes so this beats the `.hero p` margin rule above. */
-
-.hero-actions .btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
 .footer-link {
   color: var(--accent-color);
 }
 
 /* ── Cookie policy page ───────────────────────────────────────────────── */
 
+/*
+ * No `padding` here. This sits on a <section>, so the base `section` rule
+ * already supplies the desktop value — and stating it again at class
+ * specificity beat the narrow-screen override, which is why the cookie policy
+ * kept 80px of vertical padding on a phone.
+ */
 .policy-section {
-  padding: var(--space-8) 0;
   border-bottom: none;
 }
 
@@ -829,6 +1290,142 @@ button:focus-visible {
   padding-top: var(--space-6);
   border-top: 1px solid var(--border-color);
   text-align: center;
+}
+
+/*
+ * CookieFirst injects its policy text and a wide cookie table into these two
+ * containers at runtime. There is no authored markup to hang a class on — it
+ * replaces their innerHTML — so the containers themselves have to be the
+ * scrollers, and the table rules have to be plain element selectors.
+ *
+ * Nothing styled the table before, so on a phone it simply ran past the
+ * viewport and was clipped: the consent, provider and retention columns were
+ * unreachable.
+ *
+ * html-validate never sees this markup, so none of it is covered by a check.
+ */
+#cookiefirst-policy-page,
+#cookiefirst-cookies-table {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#cookiefirst-policy-page table,
+#cookiefirst-cookies-table table {
+  width: 100%;
+  /* Below this the columns collapse into unreadable slivers; scroll instead. */
+  min-width: 34rem;
+  border-collapse: collapse;
+  font-size: var(--fs-meta);
+}
+
+#cookiefirst-policy-page th,
+#cookiefirst-policy-page td,
+#cookiefirst-cookies-table th,
+#cookiefirst-cookies-table td {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  text-align: left;
+  vertical-align: top;
+  color: var(--text-secondary);
+}
+
+#cookiefirst-policy-page th,
+#cookiefirst-cookies-table th {
+  background: var(--overlay-tint);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* The injected prose inherits nothing useful from .policy-card's children. */
+#cookiefirst-policy-page h2,
+#cookiefirst-policy-page h3 {
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-3);
+  font-family: var(--font-display);
+  font-size: var(--fs-title);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+#cookiefirst-policy-page p,
+#cookiefirst-policy-page li {
+  margin-bottom: var(--space-3);
+  color: var(--text-secondary);
+}
+
+#cookiefirst-policy-page ul,
+#cookiefirst-policy-page ol {
+  padding-left: var(--space-6);
+  margin: var(--space-4) 0;
+}
+
+/* ── Research page ────────────────────────────────────────────────────── */
+
+.page-hero {
+  padding: var(--space-8) 0 var(--space-7);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.page-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 3.25rem);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  letter-spacing: -0.02em;
+}
+
+/* Primary ink, not secondary: this one paragraph sits on the bare ground, and
+   #fafafa measures 9:1 over a particle where #a0a0a0 measures 3.6:1. Lifting
+   the colour is a lighter fix than boxing a lead paragraph under its own h1. */
+.page-hero .lead {
+  max-width: var(--measure);
+  margin-top: var(--space-4);
+  font-size: var(--fs-lead);
+  color: var(--text-primary);
+}
+
+.focus-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: var(--space-5);
+}
+
+.focus-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: var(--surface-pad);
+  display: flex;
+  flex-direction: column;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Focus cards are not links either. */
+.focus-card:hover {
+  border-color: var(--accent-color);
+}
+
+.focus-card h3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-title);
+  font-weight: 600;
+  line-height: var(--lh-snug);
+  margin-bottom: var(--space-3);
+}
+
+.focus-card p {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-4);
+}
+
+/* Pushes the tag row to the card's foot so a short and a long card still line
+   their tags up with each other. */
+.focus-card .skills-list {
+  margin-top: auto;
 }
 
 /* ── Restructured sections ────────────────────────────────────────────── */
@@ -970,6 +1567,24 @@ button:focus-visible {
   margin-top: var(--space-2);
 }
 
+/* Citation metadata: the resolvable identifier, set apart from the venue. */
+.biblio-doi {
+  margin-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+}
+
+.biblio-doi a {
+  color: var(--text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  overflow-wrap: anywhere;
+}
+
+.biblio-doi a:hover {
+  color: var(--accent-color);
+}
+
 /* ── Experience: a dated spine ────────────────────────────────────────── */
 
 .timeline-role {
@@ -1019,8 +1634,59 @@ button:focus-visible {
   margin-top: var(--space-1);
 }
 
-/* ── Narrow screens: rails stack above their content ──────────────────── */
+/*
+ * ── Narrow screens ────────────────────────────────────────────────────────
+ *
+ * Everything that overrides a surface lives here, at the bottom, because a
+ * media query adds no specificity: written earlier in the file, each of these
+ * would lose to the very rule it is meant to beat.
+ */
 
+@media (max-width: 767.98px) {
+  /*
+   * Drop the blur on phones. backdrop-filter on the header plus every card and
+   * entry — two dozen elements, all compositing against a canvas that redraws
+   * at 60fps — is the heaviest thing on the page, and mobile GPUs feel it on
+   * every scroll frame. The near-opaque fill keeps the separation the blur was
+   * providing; see --card-bg-solid.
+   */
+  header,
+  .hero-card,
+  .card,
+  .biblio-item,
+  .timeline-item,
+  .edu-item,
+  .nav-links {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .hero-card,
+  .card,
+  .biblio-item,
+  .timeline-item,
+  .edu-item {
+    background-color: var(--card-bg-solid);
+  }
+
+  header {
+    background-color: var(--primary-color);
+  }
+
+  /* 48px of padding either side left ~190px of content on a 320px screen. */
+  .hero-card {
+    padding: var(--space-5);
+  }
+
+  /*
+   * .card is not listed here. It inherits --surface-pad (24px), and the rule
+   * that used to sit at this breakpoint set 32px under a comment reading
+   * "reduce padding on mobile" — it was giving phones more padding than the
+   * desktop it was meant to trim.
+   */
+}
+
+/* Rails stack above their content. */
 @media (max-width: 640px) {
   .biblio-item,
   .timeline-item,
@@ -1029,21 +1695,23 @@ button:focus-visible {
     gap: var(--space-1);
   }
 
-  .hero-card {
+  .hero-split {
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-4);
   }
 }
 
-/* Hero stacks on small screens; the statement stays the lead. */
-@media (max-width: 640px) {
-  .hero-detail {
-    flex-direction: column;
-    gap: var(--space-4);
+@media (max-width: 480px) {
+  .hero-card,
+  .card,
+  .biblio-item,
+  .timeline-item,
+  .edu-item {
+    padding: var(--space-4);
   }
 
-  .hero-statement {
-    max-width: none;
+  .container {
+    padding: 0 var(--space-3);
   }
 }

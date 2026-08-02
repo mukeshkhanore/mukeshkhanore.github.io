@@ -37,6 +37,7 @@ const SOURCES = [
   "Assets/data.js",
   "Assets/script.js",
   "index.html",
+  "research.html",
   "cookie-policy.html",
   "404.html",
 ];

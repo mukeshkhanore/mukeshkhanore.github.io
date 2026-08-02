@@ -13,7 +13,7 @@ activities, certificates, projects, skills and teaching sections.
 After editing it, run:
 
 ```bash
-npm run build      # regenerates the icon sprite and re-renders index.html
+npm run build      # icon sprite, pre-rendered HTML + JSON-LD, CSP hash
 ```
 
 then commit both `Assets/data.js` and `index.html`. CI fails if you forget —
@@ -26,8 +26,12 @@ Adding a publication, for example:
   {
     "type": "presentation",        // or omit for a journal article
     "title": "…",
-    "meta": "Conference, City, 2026",
-    "authors": "M. Khanore, …",
+    "journal": "Physica Scripta",
+    "volume": "101",
+    "pages": "155904",
+    "year": "2026",
+    "doi": "10.1088/1402-4896/ae59c0",
+    "authors": "Václav Janiš, Mukesh Khanore",
     "description": "…",
     "url": "https://…"
   },
@@ -36,8 +40,14 @@ Adding a publication, for example:
 ```
 
 `type: "presentation"` marks the entry's year rail with `--mark-color` and
-labels it _presentation_; anything else reads as _journal_. The year shown in
-the rail is parsed out of `meta`, so keep the `(YYYY)` in the venue string.
+labels it _presentation_; anything else reads as _journal_.
+
+`journal`, `volume`, `pages`, `year` and `doi` drive three things at once: the
+citation line under the title, the `doi:` link, and the `ScholarlyArticle`
+entry in the JSON-LD. Because they all read from the same fields, the citation
+a human sees and the one a scraper reads cannot disagree. An older entry with
+only a `meta` string still works — `pubYear()` falls back to scraping the
+`(YYYY)` out of it.
 
 ### Adding a whole new section
 
@@ -92,6 +102,15 @@ publication exists only after JavaScript runs — invisible to crawlers,
 archivers, citation scrapers and reader modes, which is the wrong trade for a
 publication list.
 
+It also generates the JSON-LD block: a `Person` built from `data.js`'s `seo`
+and `profile` keys, plus one `ScholarlyArticle` per publication. That has to
+stay a **single** `<script type="application/ld+json">` block — the CSP has one
+`sha256` slot and `check-integrity.js --fix` rewrites exactly one, so a second
+block would overwrite the first one's hash and get itself blocked.
+
+Because the JSON-LD changes whenever `data.js` does, `npm run build` runs
+`npm run sri` last to re-hash it.
+
 It runs the **real** `Assets/script.js` against a DOM stub, so there is one
 renderer and the server and client output cannot drift. The client still
 re-renders on load, so the JS remains a progressive layer. `--check` mode fails
@@ -133,6 +152,51 @@ expected number of cards, that no card has an empty heading, that no `url`
 field collapsed to `"#"`, and that every grid in `index.html` is claimed by a
 `SECTION_SPECS` entry. A typo in `data.js` fails here rather than on the live
 page.
+
+### Fonts
+
+Inter and Space Grotesk are **self-hosted** in `Assets/fonts/`, one variable
+file per family, subsetted to the characters the site actually uses. The
+`@font-face` rules live at the top of `Assets/style.css` and both files are
+`<link rel="preload">`ed from every page.
+
+This replaced the `fonts.googleapis.com` stylesheet, which was render-blocking
+on a third-party origin and only _then_ triggered font downloads from a second
+origin. It also removed both origins from the CSP.
+
+If new characters appear in `Assets/data.js` — a new author name with an accent,
+a new chemical formula — regenerate the subsets, or the missing glyph silently
+falls back to a system font mid-word:
+
+```bash
+# Collect the charset the site uses, then ask Google for exactly that subset:
+#   https://fonts.googleapis.com/css2?family=Inter:wght@100..900&text=<charset>
+# Save the woff2 it points at to Assets/fonts/inter.woff2 (likewise Space Grotesk).
+```
+
+Check coverage with `fontTools`:
+
+```python
+from fontTools.ttLib import TTFont
+f = TTFont("Assets/fonts/inter.woff2")
+cmap = set().union(*(t.cmap.keys() for t in f["cmap"].tables))
+print([c for c in "your text here" if ord(c) not in cmap])
+```
+
+### Third-party scripts
+
+`consent.js` is `defer`red. It used to be a synchronous third-party script in
+`<head>`, blocking HTML parsing for ~376ms on every page load. Ordering is still
+correct: `Assets/analytics.js` is synchronous and sets every storage type to
+denied during parsing, so the safe default is in place well before the banner or
+`gtag.js` can act on it. This is the no-autoblock CookieFirst build, so the
+banner does not block anything itself — do not remove `defer` without checking
+that assumption again.
+
+`gtag.js` is **504KB**, by far the largest thing the page pulls, and it loads on
+every view regardless of consent. It is `async`, so it does not block rendering,
+but it is a real main-thread cost on a phone. Loading it only after consent is
+granted would remove that, at the cost of GA4's cookieless modelling.
 
 ## Privacy and analytics
 

@@ -6,13 +6,13 @@
     <!-- No analytics or consent tooling here: this page sets no cookies. -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; upgrade-insecure-requests;"
+      content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; upgrade-insecure-requests;"
     />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="robots" content="noindex, follow" />
 
     <title>Page Not Found - Mukesh Khanore</title>
-    <meta name="theme-color" content="#2c3e50" />
+    <meta name="theme-color" content="#0a0a0a" />
     <link
       rel="icon"
       type="image/svg+xml"
@@ -21,11 +21,21 @@
     <!-- Absolute paths: this page is served for URLs at any depth. -->
     <link rel="stylesheet" href="/Assets/style.css" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Same-origin and subsetted, so the type is on the wire with the CSS
+         instead of two round trips behind a third-party stylesheet. -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500&amp;family=Source+Sans+3:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,600&amp;display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="/Assets/fonts/inter.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/Assets/fonts/space-grotesk.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
   </head>
 
@@ -127,8 +137,8 @@
         />
       </symbol>
     </svg>
-    <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
     <header>
       <div class="container">
         <nav aria-label="Main navigation">

@@ -42,6 +42,9 @@ const stubElement = () => ({
   classList: { toggle() {}, contains: () => false, remove() {} },
 });
 
+// Populated by probeCvLink(); keyed by the selector initCvLink() asks for.
+const cvLinks = {};
+
 const context = {
   console,
   document: {
@@ -53,13 +56,16 @@ const context = {
       return grids.get(id);
     },
     querySelector: () => null,
+    // initCvLink() collects its buttons this way; probeCvLink below swaps in
+    // the pair it wants to observe.
+    querySelectorAll: (selector) => cvLinks[selector] || [],
   },
   window: {
     matchMedia: () => ({ matches: false, addEventListener() {} }),
     addEventListener() {},
   },
   localStorage: { getItem: () => null, setItem() {} },
-  getComputedStyle: () => ({ getPropertyValue: () => "#52d1b8" }),
+  getComputedStyle: () => ({ getPropertyValue: () => "#ff7a59" }),
   URL,
 };
 context.globalThis = context;
@@ -72,7 +78,8 @@ vm.runInContext(read("Assets/script.js"), context, { filename: "script.js" });
 // the global object — exactly as it does across two <script> tags in a browser
 // — so reach it by evaluating an expression in that same scope.
 const api = vm.runInContext(
-  "({ portfolioData, SECTION_SPECS, validatePortfolioData, renderProfile, renderSections, initCvLink })",
+  "({ portfolioData, SECTION_SPECS, validatePortfolioData, renderProfile," +
+    " renderSections, renderResearch, initCvLink })",
   context,
 );
 
@@ -87,6 +94,9 @@ check(
 
 api.renderProfile(data.profile);
 api.renderSections(data);
+// research.html's blocks go through the same stub, so the class-coverage scan
+// below sees .focus-card and friends too.
+api.renderResearch(data);
 
 /* ── Assertions ───────────────────────────────────────────────────────── */
 
@@ -129,6 +139,24 @@ for (const [key, spec] of Object.entries(api.SECTION_SPECS)) {
   check(
     deadLinks === 0,
     `section "${key}": ${deadLinks} link(s) fell back to "#" — check the url fields`,
+  );
+}
+
+/*
+ * research.html's blocks. Each pattern matches only the top-level row for that
+ * block — a looser `<li |<article ` counted the tag chips inside the focus
+ * cards as well, making three cards look like fifteen.
+ */
+for (const [id, pattern, expected] of [
+  ["focus-grid", /<article class="focus-card"/g, data.research.focus.length],
+  ["methods-grid", /<li class="skill-tag"/g, data.research.methods.length],
+  ["selected-publications", /<li class="biblio-item/g, 4],
+]) {
+  const html = grids.get(id) ? grids.get(id).innerHTML : "";
+  const rendered = (html.match(pattern) || []).length;
+  check(
+    rendered === expected,
+    `research: #${id} rendered ${rendered} rows, expected ${expected}`,
   );
 }
 
@@ -183,36 +211,46 @@ check(
 
 /* ── CV button reveal ─────────────────────────────────────────────────── */
 
-/** Run initCvLink() against a stubbed fetch and report the container state. */
+/**
+ * Run initCvLink() against a stubbed fetch and report whether the buttons were
+ * revealed. There are two of them now — one in the header, one in the hero —
+ * and a single probe has to flip both, so this asserts on the pair rather than
+ * on one container.
+ */
 function probeCvLink(fetchResult) {
-  const container = { hidden: true };
-  grids.set("cv-link", {
+  const containers = [{ hidden: true }, { hidden: true }];
+  cvLinks["[data-cv-link]"] = containers.map((container) => ({
     href: "https://mukeshkhanore.github.io/Assets/Mukesh_Khanore_CV.pdf",
     closest: () => container,
-  });
+  }));
   context.fetch = () => fetchResult;
 
   api.initCvLink();
   // Settle the promise chain inside initCvLink before reading the result.
   return new Promise((resolve) =>
-    setImmediate(() => resolve(container.hidden)),
+    setImmediate(() => resolve(containers.map((c) => c.hidden))),
   );
 }
+
+/** True when every CV container is still hidden. */
+const allHidden = (states) => states.every((hidden) => hidden === true);
+/** True when every CV container was revealed. */
+const allShown = (states) => states.every((hidden) => hidden === false);
 
 /* ── Report ───────────────────────────────────────────────────────────── */
 
 async function main() {
   check(
-    (await probeCvLink(Promise.resolve({ ok: true }))) === false,
-    "CV button stayed hidden even though the PDF responded 200",
+    allShown(await probeCvLink(Promise.resolve({ ok: true }))),
+    "a CV button stayed hidden even though the PDF responded 200",
   );
   check(
-    (await probeCvLink(Promise.resolve({ ok: false }))) === true,
-    "CV button was revealed despite the PDF 404ing",
+    allHidden(await probeCvLink(Promise.resolve({ ok: false }))),
+    "a CV button was revealed despite the PDF 404ing",
   );
   check(
-    (await probeCvLink(Promise.reject(new Error("offline")))) === true,
-    "CV button was revealed even though the probe threw",
+    allHidden(await probeCvLink(Promise.reject(new Error("offline")))),
+    "a CV button was revealed even though the probe threw",
   );
 
   if (problems.length > 0) {

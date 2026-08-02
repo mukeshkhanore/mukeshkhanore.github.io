@@ -64,5 +64,5 @@ jobs:
           args: >-
             --config lychee.toml --no-progress
             --root-dir ${{ github.workspace }}
-            index.html cookie-policy.html 404.html Assets/data.js
+            index.html research.html cookie-policy.html 404.html Assets/data.js
           fail: true

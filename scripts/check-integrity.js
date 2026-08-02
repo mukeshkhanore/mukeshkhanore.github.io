@@ -26,7 +26,12 @@ const https = require("https");
 const crypto = require("crypto");
 
 const ROOT = path.join(__dirname, "..");
-const HTML_FILES = ["index.html", "cookie-policy.html", "404.html"];
+const HTML_FILES = [
+  "index.html",
+  "research.html",
+  "cookie-policy.html",
+  "404.html",
+];
 const FIX = process.argv.includes("--fix");
 
 let failures = 0;

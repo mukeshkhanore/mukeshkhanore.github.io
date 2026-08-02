@@ -4,12 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!--
-      Content Security Policy.
-      script-src has no 'unsafe-inline': the only inline script is the JSON-LD
-      block below, allowed by its sha256 hash. If you edit that block, rerun
-      `npm run sri` (or the CI check will fail) and paste the new hash here.
-      style-src keeps 'unsafe-inline' because the CookieFirst banner styles
-      itself inline and GitHub Pages cannot serve a nonce.
+      Content Security Policy. script-src has no 'unsafe-inline': the only
+      inline script is the JSON-LD block below, allowed by its sha256 hash.
+      scripts/prerender.js regenerates that block from Assets/data.js, so
+      `npm run build` finishes with `npm run sri` to re-hash it.
     -->
     <meta
       http-equiv="Content-Security-Policy"
@@ -17,27 +15,33 @@
     />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
-    <title>Mukesh Khanore - Physics PhD &amp; Data Scientist</title>
+    <title>Research &amp; Impact — Mukesh Khanore</title>
     <meta name="author" content="Mukesh Khanore" />
     <meta
       name="description"
-      content="Mukesh Khanore – Computational Physicist, PhD Researcher, and Data Scientist specializing in machine learning for atomic simulations of materials like perovskites."
+      content="Research and impact of Mukesh Khanore: machine-learned interatomic potentials, perovskite oxides and ferroelectrics, and high-performance materials simulation."
     />
     <meta name="theme-color" content="#0a0a0a" />
-    <link rel="canonical" href="https://mukeshkhanore.github.io/" />
+    <link
+      rel="canonical"
+      href="https://mukeshkhanore.github.io/research.html"
+    />
 
     <!-- Open Graph (LinkedIn, Slack, Facebook) -->
-    <meta property="og:type" content="profile" />
+    <meta property="og:type" content="article" />
     <meta property="og:site_name" content="Mukesh Khanore" />
     <meta
       property="og:title"
-      content="Mukesh Khanore - Physics PhD & Data Scientist"
+      content="Research &amp; Impact — Mukesh Khanore"
     />
     <meta
       property="og:description"
-      content="Computational Physicist and PhD Researcher developing machine learning approaches for large-scale atomic simulations of perovskites."
+      content="Research and impact of Mukesh Khanore: machine-learned interatomic potentials, perovskite oxides and ferroelectrics, and high-performance materials simulation."
     />
-    <meta property="og:url" content="https://mukeshkhanore.github.io/" />
+    <meta
+      property="og:url"
+      content="https://mukeshkhanore.github.io/research.html"
+    />
     <meta
       property="og:image"
       content="https://mukeshkhanore.github.io/Assets/profile_avatar.jpg"
@@ -46,18 +50,16 @@
     <meta property="og:image:height" content="400" />
     <meta property="og:image:alt" content="Portrait of Mukesh Khanore" />
     <meta property="og:locale" content="en_US" />
-    <meta property="profile:first_name" content="Mukesh" />
-    <meta property="profile:last_name" content="Khanore" />
 
     <!-- Twitter / X card -->
     <meta name="twitter:card" content="summary" />
     <meta
       name="twitter:title"
-      content="Mukesh Khanore - Physics PhD & Data Scientist"
+      content="Research &amp; Impact — Mukesh Khanore"
     />
     <meta
       name="twitter:description"
-      content="Computational Physicist and PhD Researcher developing machine learning approaches for large-scale atomic simulations of perovskites."
+      content="Research and impact of Mukesh Khanore: machine-learned interatomic potentials, perovskite oxides and ferroelectrics, and high-performance materials simulation."
     />
     <meta
       name="twitter:image"
@@ -410,10 +412,9 @@
         />
       </symbol>
     </svg>
+
     <canvas id="bg-canvas" aria-hidden="true"></canvas>
     <a href="#main-content" class="skip-link">Skip to main content</a>
-
-    <!-- Decorative background animation -->
 
     <header>
       <div class="container">
@@ -424,19 +425,31 @@
                they are just not competing for room in the header. -->
           <ul class="nav-links">
             <li>
-              <a href="#about" aria-label="Home — about Mukesh Khanore">Home</a>
+              <a href="index.html" aria-label="Home — about Mukesh Khanore"
+                >Home</a
+              >
             </li>
             <li>
-              <a href="research.html" aria-label="Research and impact"
+              <a
+                href="research.html"
+                class="is-active"
+                aria-current="page"
+                aria-label="Research and impact"
                 >Research</a
               >
             </li>
             <li>
-              <a href="#publications" aria-label="Publications">Publications</a>
+              <a href="index.html#publications" aria-label="Publications"
+                >Publications</a
+              >
             </li>
-            <li><a href="#projects" aria-label="Projects">Projects</a></li>
-            <li><a href="#skills" aria-label="Skills">Skills</a></li>
-            <li><a href="#contact" aria-label="Contact">Contact</a></li>
+            <li>
+              <a href="index.html#projects" aria-label="Projects">Projects</a>
+            </li>
+            <li><a href="index.html#skills" aria-label="Skills">Skills</a></li>
+            <li>
+              <a href="index.html#contact" aria-label="Contact">Contact</a>
+            </li>
             <li class="hero-cv" hidden>
               <a
                 data-cv-link
@@ -475,103 +488,77 @@
     </header>
 
     <main id="main-content">
-      <section id="about" class="hero" aria-labelledby="profile-name">
+      <section class="page-hero" aria-labelledby="research-heading">
         <div class="container">
-          <div class="hero-card hero-split">
-            <picture>
-              <source srcset="Assets/profile_avatar.webp" type="image/webp" />
-              <img
-                id="profile-avatar"
-                src="Assets/profile_avatar.jpg"
-                alt="Mukesh Khanore"
-                class="profile-photo"
-                width="140"
-                height="140"
-                fetchpriority="high"
-              />
-            </picture>
+          <h1 id="research-heading">Research &amp; Impact</h1>
+          <p id="research-intro" class="lead">
+            My work sits between electronic-structure theory and machine
+            learning.
+          </p>
+        </div>
+      </section>
 
-            <!-- One column for every piece of hero text, so the name, the
-                 title, the statement, the bio and the buttons all share a
-                 single left edge. -->
-            <div class="hero-text">
-              <h1 id="profile-name">Mukesh Khanore</h1>
-              <p id="profile-tagline" class="hero-tagline">
-                Computational Physicist &amp; PhD Researcher
+      <section id="focus" aria-labelledby="focus-heading">
+        <div class="container">
+          <h2 id="focus-heading">Focus Areas</h2>
+          <div id="focus-grid" class="focus-grid">
+            <article class="focus-card">
+              <h3>Machine-Learned Interatomic Potentials</h3>
+              <p>
+                Fine-tuning GRACE and ACE-type potentials on curated VASP MLFF
+                datasets, then validating them against DFT energies, forces and
+                phonon spectra. The goal is ab-initio accuracy at a cost that
+                scales to systems classical DFT cannot reach.
               </p>
-              <p id="profile-summary" class="hero-summary">
-                I build machine-learning interatomic potentials that make
-                large-scale atomistic simulations of ferroelectric perovskites
-                run orders of magnitude faster while keeping ab-initio accuracy.
-                My work spans model training, scientific software development
-                and high-performance computing on national and European
-                supercomputers.
+              <ul class="skills-list">
+                <li class="skill-tag skill-tag--sm">GRACE</li>
+                <li class="skill-tag skill-tag--sm">ACE</li>
+                <li class="skill-tag skill-tag--sm">VASP MLFF</li>
+                <li class="skill-tag skill-tag--sm">Active learning</li>
+              </ul>
+            </article>
+            <article class="focus-card">
+              <h3>High-Performance Materials Simulation</h3>
+              <p>
+                Running and scaling these calculations on national and European
+                supercomputers: Slurm job pipelines, containerised toolchains,
+                and GPU workflows for both training and production molecular
+                dynamics.
               </p>
-
-              <div class="hero-actions">
-                <a href="#publications" class="btn btn--primary"
-                  >View Publications</a
-                >
-                <a href="#contact" class="btn btn--ghost">Contact Me</a>
-                <p class="hero-cv" hidden>
-                  <a
-                    id="cv-link"
-                    data-cv-link
-                    href="Assets/Mukesh_Khanore_CV.pdf"
-                    class="btn btn--ghost"
-                    aria-label="Download CV as PDF"
-                    download
-                  >
-                    <svg class="icon" aria-hidden="true">
-                      <use href="#i-file-arrow-down"></use>
-                    </svg>
-                    Download CV
-                  </a>
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- The long bio sits below the card, at reading measure, so the
-               hero stays a scannable summary rather than a wall of text. -->
-          <div id="profile-bio" class="hero-bio">
-            <p>
-              I am a computational physicist finishing a PhD at Charles
-              University and the Institute of Physics of the Czech Academy of
-              Sciences. My research trains machine-learned interatomic
-              potentials on ab-initio data so that simulations which would take
-              weeks of DFT can run in hours without giving up quantum-level
-              accuracy.
-            </p>
-            <p>
-              Before returning to academia I spent two years in industry as a
-              data scientist and analyst — leading small teams, building
-              forecasting models for electricity demand and renewable
-              generation, and turning messy operational data into something
-              decision-makers could act on.
-            </p>
-            <p>
-              Day to day I work in Python and FORTRAN on Slurm clusters, with a
-              background in numerical methods, sparse linear algebra and GPU
-              workflows. I have published on strongly correlated electrons,
-              ultracold atoms in optical lattices, and the energy landscapes of
-              perovskites.
-            </p>
+              <ul class="skills-list">
+                <li class="skill-tag skill-tag--sm">Slurm</li>
+                <li class="skill-tag skill-tag--sm">Apptainer</li>
+                <li class="skill-tag skill-tag--sm">GPU</li>
+                <li class="skill-tag skill-tag--sm">LAMMPS</li>
+              </ul>
+            </article>
           </div>
         </div>
       </section>
 
-      <section
-        id="publications"
-        class="section--lead"
-        aria-labelledby="publications-heading"
-      >
+      <section id="methods" aria-labelledby="methods-heading">
         <div class="container">
-          <p class="section-eyebrow" id="publications-meta">
-            6 entries · 2014–2026
-          </p>
-          <h2 id="publications-heading">Publications</h2>
-          <div id="publications-grid" class="section-body">
+          <h2 id="methods-heading">Methods &amp; Tools</h2>
+          <div id="methods-grid">
+            <ul class="skills-list">
+              <li class="skill-tag">Python</li>
+              <li class="skill-tag">LAMMPS</li>
+              <li class="skill-tag">VASP</li>
+              <li class="skill-tag">ASE</li>
+              <li class="skill-tag">Ovito</li>
+              <li class="skill-tag">Pymatgen</li>
+              <li class="skill-tag">Scikit-learn</li>
+              <li class="skill-tag">Pandas</li>
+              <li class="skill-tag">NumPy</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="selected" aria-labelledby="selected-heading">
+        <div class="container">
+          <h2 id="selected-heading">Selected Publications</h2>
+          <div id="selected-publications" class="section-body">
             <ol class="biblio">
               <li class="biblio-item">
                 <div class="biblio-year">2026</div>
@@ -716,620 +703,13 @@
                   </p>
                 </div>
               </li>
-              <li class="biblio-item">
-                <div class="biblio-year">2015</div>
-                <div class="biblio-entry">
-                  <h3 class="biblio-title">
-                    <a
-                      href="https://doi.org/10.1063/1.4917674"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      >Coexistence of Mott and superfluid domain of bosons
-                      confined in optical lattice<svg
-                        class="icon biblio-arrow"
-                        aria-hidden="true"
-                      >
-                        <use href="#i-link"></use></svg
-                    ></a>
-                  </h3>
-                  <p class="biblio-authors">
-                    Mukesh Khanore and Bishwajyoti Dey
-                  </p>
-                  <p class="biblio-venue">
-                    AIP Conference Proceedings 1665, 030033 (2015)<span
-                      class="biblio-kind"
-                      >journal</span
-                    >
-                  </p>
-                  <p class="biblio-note">
-                    Analyzed the coexistence of Mott insulator and superfluid
-                    phases for bosons confined in an optical lattice.
-                  </p>
-                  <p class="biblio-doi">
-                    <a
-                      href="https://doi.org/10.1063/1.4917674"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      >doi:10.1063/1.4917674</a
-                    >
-                  </p>
-                </div>
-              </li>
-              <li class="biblio-item">
-                <div class="biblio-year">2014</div>
-                <div class="biblio-entry">
-                  <h3 class="biblio-title">
-                    <a
-                      href="https://doi.org/10.1063/1.4872558"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      >Bose–Hubbard model with attractive interactions and
-                      inhomogeneous lattice potential<svg
-                        class="icon biblio-arrow"
-                        aria-hidden="true"
-                      >
-                        <use href="#i-link"></use></svg
-                    ></a>
-                  </h3>
-                  <p class="biblio-authors">
-                    Mukesh Khanore and Bishwajyoti Dey
-                  </p>
-                  <p class="biblio-venue">
-                    AIP Conference Proceedings 1591, 139 (2014)<span
-                      class="biblio-kind"
-                      >journal</span
-                    >
-                  </p>
-                  <p class="biblio-note">
-                    Studied the Bose–Hubbard model with attractive interactions
-                    in the presence of an inhomogeneous lattice potential.
-                  </p>
-                  <p class="biblio-doi">
-                    <a
-                      href="https://doi.org/10.1063/1.4872558"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      >doi:10.1063/1.4872558</a
-                    >
-                  </p>
-                </div>
-              </li>
             </ol>
           </div>
-        </div>
-      </section>
-
-      <section id="experience" aria-labelledby="experience-heading">
-        <div class="container">
-          <h2 id="experience-heading">Experience</h2>
-          <div id="experience-grid" class="section-body">
-            <ol class="timeline">
-              <li class="timeline-item">
-                <div class="timeline-period">Oct 2022 – Present</div>
-                <div class="timeline-entry">
-                  <h3 class="timeline-role">PhD Researcher</h3>
-                  <p class="timeline-org">
-                    Institute of Physics, Czech Academy of Sciences
-                  </p>
-                  <ul class="timeline-points">
-                    <li>
-                      Developing a machine-learning approach to accelerate
-                      large-scale atomistic simulations of ferroelectric
-                      perovskites while retaining ab-initio accuracy.
-                    </li>
-                    <li>
-                      Fine-tune GRACE machine-learned interatomic potentials on
-                      curated VASP MLFF datasets; validate against DFT energies,
-                      forces, phonons and phase diagrams.
-                    </li>
-                    <li>
-                      Presented results at the 15th European Meeting on
-                      Ferroelectricity (Katowice, 2025), the XXVI Czech–Polish
-                      seminar (Milovy, 2026) and the E-MRS fall meeting (Warsaw,
-                      2026).
-                    </li>
-                  </ul>
-                </div>
-              </li>
-              <li class="timeline-item">
-                <div class="timeline-period">Feb 2022 – Aug 2022</div>
-                <div class="timeline-entry">
-                  <h3 class="timeline-role">Senior Data Analyst</h3>
-                  <p class="timeline-org">
-                    Sourcelink Software, Inc. (dba Dosii)
-                  </p>
-                  <ul class="timeline-points">
-                    <li>
-                      Led the data analytics team; owned data extraction,
-                      cleaning and validation pipelines.
-                    </li>
-                    <li>
-                      Designed and applied predictive algorithms and presented
-                      insights to stakeholders and management.
-                    </li>
-                  </ul>
-                </div>
-              </li>
-              <li class="timeline-item">
-                <div class="timeline-period">Dec 2020 – Oct 2021</div>
-                <div class="timeline-entry">
-                  <h3 class="timeline-role">Deputy Manager (Data Science)</h3>
-                  <p class="timeline-org">
-                    Regent Climate Connect Knowledge Solutions Pvt. Ltd.
-                  </p>
-                  <ul class="timeline-points">
-                    <li>
-                      Managed the weather-forecasting team; responsible for
-                      error analysis and integration of data from multiple
-                      forecast providers.
-                    </li>
-                    <li>
-                      Contributed to machine-learning weather models for
-                      electricity demand and renewable (solar and wind) power
-                      forecasting.
-                    </li>
-                  </ul>
-                </div>
-              </li>
-              <li class="timeline-item">
-                <div class="timeline-period">Oct 2019 – May 2020</div>
-                <div class="timeline-entry">
-                  <h3 class="timeline-role">Consultant</h3>
-                  <p class="timeline-org">Skymet Weather Services Pvt. Ltd.</p>
-                  <ul class="timeline-points">
-                    <li>
-                      Developed a parameter-based mathematical model in FORTRAN
-                      for weather-optimal ship routing based on forecast data.
-                    </li>
-                  </ul>
-                </div>
-              </li>
-              <li class="timeline-item">
-                <div class="timeline-period">Aug 2013 – Aug 2019</div>
-                <div class="timeline-entry">
-                  <h3 class="timeline-role">Project Assistant</h3>
-                  <p class="timeline-org">
-                    Department of Physics, S. P. Pune University
-                  </p>
-                  <ul class="timeline-points">
-                    <li>
-                      Studied ground-state properties of ultracold atoms in
-                      rotating optical lattices via the extended Bose–Hubbard
-                      model, using both analytical and numerical methods.
-                    </li>
-                    <li>
-                      Implemented large sparse-matrix exact diagonalization with
-                      the Davidson algorithm for Hilbert spaces of dimension
-                      10⁷.
-                    </li>
-                  </ul>
-                </div>
-              </li>
-            </ol>
-          </div>
-        </div>
-      </section>
-
-      <section id="education" aria-labelledby="education-heading">
-        <div class="container">
-          <h2 id="education-heading">Education</h2>
-          <div id="education-grid" class="section-body">
-            <ol class="edu-list">
-              <li class="edu-item">
-                <div class="edu-meta">Expected 2026/2027</div>
-                <div class="edu-entry">
-                  <h3 class="edu-degree">PhD in Physics</h3>
-                  <p class="edu-org">Charles University, Prague</p>
-                  <p class="edu-note">Faculty of Mathematics and Physics.</p>
-                </div>
-              </li>
-              <li class="edu-item">
-                <div class="edu-meta">August 2013</div>
-                <div class="edu-entry">
-                  <h3 class="edu-degree">M.Sc. in Physics</h3>
-                  <p class="edu-org">University of Pune</p>
-                  <p class="edu-note">Department of Physics.</p>
-                </div>
-              </li>
-              <li class="edu-item">
-                <div class="edu-meta"></div>
-                <div class="edu-entry">
-                  <h3 class="edu-degree">B.Sc. in Physics</h3>
-                  <p class="edu-org">S. P. College, University of Pune</p>
-                </div>
-              </li>
-            </ol>
-          </div>
-        </div>
-      </section>
-
-      <section id="projects" aria-labelledby="projects-heading">
-        <div class="container">
-          <h2 id="projects-heading">Projects</h2>
-          <div id="projects-grid" class="card-grid">
-            <a
-              class="card card--link"
-              href="https://github.com/mukeshkhanore/pdf-to-bibtex"
-              target="_blank"
-              rel="noopener noreferrer"
-              ><h3>PDF to BibTeX</h3>
-              <div class="meta">Automation Tool</div>
-              <p>
-                Scans a folder of paper PDFs, extracts the DOI embedded in each
-                one and resolves it into a formatted BibTeX entry. Built to keep
-                a growing LaTeX bibliography in sync with a reference library
-                without retyping citations by hand.
-              </p>
-              <div class="skills-list card-tag-row">
-                <span class="skill-tag skill-tag--sm">Python</span
-                ><span class="skill-tag skill-tag--sm">LaTeX</span
-                ><span class="skill-tag skill-tag--sm">BibTeX</span
-                ><span class="skill-tag skill-tag--sm">DOI</span>
-              </div></a
-            ><a
-              class="card card--link"
-              href="https://github.com/mukeshkhanore/descriptors_visualization"
-              target="_blank"
-              rel="noopener noreferrer"
-              ><h3>Descriptors Visualization</h3>
-              <div class="meta">Materials Science</div>
-              <p>
-                Desktop GUI for generating structural descriptors from atomic
-                configurations and plotting them interactively. Used to
-                sanity-check the feature representations that go into
-                machine-learned interatomic potentials before training.
-              </p>
-              <div class="skills-list card-tag-row">
-                <span class="skill-tag skill-tag--sm">Python</span
-                ><span class="skill-tag skill-tag--sm">GUI</span
-                ><span class="skill-tag skill-tag--sm">Descriptors</span
-                ><span class="skill-tag skill-tag--sm">Materials Science</span>
-              </div></a
-            ><a
-              class="card card--link"
-              href="https://github.com/mukeshkhanore/1d_hubbard_model"
-              target="_blank"
-              rel="noopener noreferrer"
-              ><h3>1D Hubbard Model</h3>
-              <div class="meta">Physics Simulation</div>
-              <p>
-                Numerical solver for the one-dimensional Hubbard model of
-                correlated electrons, computing ground-state properties across
-                the interaction strength range. A compact reference
-                implementation of the exact-diagonalization approach used in my
-                published work.
-              </p>
-              <div class="skills-list card-tag-row">
-                <span class="skill-tag skill-tag--sm">Python</span
-                ><span class="skill-tag skill-tag--sm"
-                  >Exact Diagonalization</span
-                ><span class="skill-tag skill-tag--sm">Condensed Matter</span>
-              </div></a
-            ><a
-              class="card card--link"
-              href="https://github.com/mukeshkhanore/Qiskit_testing"
-              target="_blank"
-              rel="noopener noreferrer"
-              ><h3>Qiskit Testing</h3>
-              <div class="meta">Quantum Computing</div>
-              <p>
-                Working notebooks exploring IBM&#039;s Qiskit framework —
-                circuit construction, measurement and simulator backends — as a
-                way into quantum algorithms for many-body problems.
-              </p>
-              <div class="skills-list card-tag-row">
-                <span class="skill-tag skill-tag--sm">Qiskit</span
-                ><span class="skill-tag skill-tag--sm">Python</span
-                ><span class="skill-tag skill-tag--sm">Quantum Circuits</span>
-              </div></a
-            ><a
-              class="card card--link"
-              href="https://github.com/mukeshkhanore/percolation_project"
-              target="_blank"
-              rel="noopener noreferrer"
-              ><h3>Percolation Project</h3>
-              <div class="meta">Statistical Mechanics</div>
-              <p>
-                Monte Carlo study of percolation on lattices: locating the
-                critical threshold, tracking cluster growth and visualising how
-                connectivity emerges as site occupation increases.
-              </p>
-              <div class="skills-list card-tag-row">
-                <span class="skill-tag skill-tag--sm">Python</span
-                ><span class="skill-tag skill-tag--sm">Monte Carlo</span
-                ><span class="skill-tag skill-tag--sm"
-                  >Statistical Mechanics</span
-                >
-              </div></a
-            ><a
-              class="card card--link"
-              href="https://github.com/mukeshkhanore/map_plotting_python"
-              target="_blank"
-              rel="noopener noreferrer"
-              ><h3>Map Plotting Python</h3>
-              <div class="meta">Data Visualisation</div>
-              <p>
-                Plotting utilities for geospatial forecast data, producing
-                publication-quality maps of gridded fields. Written during my
-                weather-forecasting work, where every model run needed a
-                readable spatial view.
-              </p>
-              <div class="skills-list card-tag-row">
-                <span class="skill-tag skill-tag--sm">Python</span
-                ><span class="skill-tag skill-tag--sm">Matplotlib</span
-                ><span class="skill-tag skill-tag--sm">Geospatial</span>
-              </div></a
-            ><a
-              class="card card--link"
-              href="https://github.com/mukeshkhanore/grided_data"
-              target="_blank"
-              rel="noopener noreferrer"
-              ><h3>Gridded Data</h3>
-              <div class="meta">Data Processing</div>
-              <p>
-                Routines for reading, regridding and subsetting grid-based
-                scientific datasets, so that outputs from different forecast
-                providers on different grids can be compared on common ground.
-              </p>
-              <div class="skills-list card-tag-row">
-                <span class="skill-tag skill-tag--sm">Python</span
-                ><span class="skill-tag skill-tag--sm">NumPy</span
-                ><span class="skill-tag skill-tag--sm">Data Pipelines</span>
-              </div></a
-            ><a
-              class="card card--link"
-              href="https://github.com/mukeshkhanore/any_base_number_representation"
-              target="_blank"
-              rel="noopener noreferrer"
-              ><h3>Any Base Number Representation</h3>
-              <div class="meta">Algorithms</div>
-              <p>
-                Small library for converting numbers between arbitrary bases in
-                both directions, including fractional parts — the kind of
-                primitive that turns up repeatedly in encoding and indexing
-                problems.
-              </p>
-              <div class="skills-list card-tag-row">
-                <span class="skill-tag skill-tag--sm">Python</span
-                ><span class="skill-tag skill-tag--sm">Algorithms</span
-                ><span class="skill-tag skill-tag--sm">Number Theory</span>
-              </div></a
-            ><a
-              class="card card--link"
-              href="https://github.com/mukeshkhanore/remote_access"
-              target="_blank"
-              rel="noopener noreferrer"
-              ><h3>Remote Access</h3>
-              <div class="meta">HPC Utilities</div>
-              <p>
-                Helper scripts for working on remote compute clusters: opening
-                connections, moving job files and retrieving results, cutting
-                the boilerplate out of a daily HPC workflow.
-              </p>
-              <div class="skills-list card-tag-row">
-                <span class="skill-tag skill-tag--sm">Shell</span
-                ><span class="skill-tag skill-tag--sm">SSH</span
-                ><span class="skill-tag skill-tag--sm">HPC</span>
-              </div></a
+          <p>
+            <a href="index.html#publications" class="btn btn--ghost"
+              >All publications</a
             >
-          </div>
-        </div>
-      </section>
-
-      <section id="skills" aria-labelledby="skills-heading">
-        <div class="container">
-          <h2 id="skills-heading">Skills</h2>
-          <div id="skills-grid" class="card-grid">
-            <article class="card">
-              <h3>Programming</h3>
-              <ul class="skills-list">
-                <li class="skill-tag">Python</li>
-                <li class="skill-tag">FORTRAN</li>
-                <li class="skill-tag">C</li>
-                <li class="skill-tag">Julia</li>
-                <li class="skill-tag">SQL</li>
-                <li class="skill-tag">Mathematica</li>
-                <li class="skill-tag">LaTeX</li>
-                <li class="skill-tag">gnuplot</li>
-                <li class="skill-tag">Qiskit</li>
-              </ul>
-            </article>
-            <article class="card">
-              <h3>Simulation &amp; Tools</h3>
-              <ul class="skills-list">
-                <li class="skill-tag">VASP (DFT, MLFF)</li>
-                <li class="skill-tag">LAMMPS</li>
-                <li class="skill-tag">ASE</li>
-                <li class="skill-tag">Phonopy</li>
-                <li class="skill-tag">GRACE / ACE-type MLIPs</li>
-                <li class="skill-tag">TensorFlow</li>
-                <li class="skill-tag">scikit-learn</li>
-                <li class="skill-tag">Graph neural networks</li>
-                <li class="skill-tag">Slurm / PBS clusters</li>
-                <li class="skill-tag">Singularity / Apptainer</li>
-                <li class="skill-tag">Git</li>
-                <li class="skill-tag">Linux</li>
-                <li class="skill-tag">Google Cloud</li>
-              </ul>
-            </article>
-            <article class="card">
-              <h3>Research &amp; Physics</h3>
-              <ul class="skills-list">
-                <li class="skill-tag">Density functional theory</li>
-                <li class="skill-tag">
-                  Machine-learned interatomic potentials
-                </li>
-                <li class="skill-tag">Ferroelectric perovskites</li>
-                <li class="skill-tag">Strongly correlated electrons</li>
-                <li class="skill-tag">Ultracold atoms in optical lattices</li>
-                <li class="skill-tag">Exact diagonalization</li>
-                <li class="skill-tag">Phonon and phase-diagram calculations</li>
-                <li class="skill-tag">
-                  Numerical methods and sparse linear algebra
-                </li>
-              </ul>
-            </article>
-            <article class="card">
-              <h3>Soft Skills</h3>
-              <ul class="skills-list">
-                <li class="skill-tag">Team leadership</li>
-                <li class="skill-tag">Stakeholder communication</li>
-                <li class="skill-tag">Conference presentation</li>
-                <li class="skill-tag">Scientific writing</li>
-                <li class="skill-tag">Teaching and mentoring</li>
-                <li class="skill-tag">Cross-disciplinary collaboration</li>
-              </ul>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section id="certificates" aria-labelledby="certificates-heading">
-        <div class="container">
-          <h2 id="certificates-heading">Certificates</h2>
-          <div id="certificates-grid" class="card-grid">
-            <a
-              class="card card--link"
-              href="https://learn.nvidia.com/certificates?id=Ppjc0iNlRJ2yiJdoVhOKgw"
-              target="_blank"
-              rel="noopener noreferrer"
-              ><h3>
-                <svg class="icon card-icon" aria-hidden="true">
-                  <use href="#i-microchip"></use></svg
-                >Fundamentals of Deep Learning
-              </h3>
-              <div class="meta">NVIDIA Deep Learning Institute</div>
-              <p>
-                Covered practical deep learning techniques using modern neural
-                network frameworks for real-world AI applications.
-              </p>
-              <p class="card-view-link">
-                View certificate
-                <svg class="icon card-ext-icon" aria-hidden="true">
-                  <use href="#i-link"></use>
-                </svg></p></a
-            ><a
-              class="card card--link"
-              href="https://learn.nvidia.com/certificates?id=HuN3OyBJTzuQB_SFkWH_WA"
-              target="_blank"
-              rel="noopener noreferrer"
-              ><h3>
-                <svg class="icon card-icon" aria-hidden="true">
-                  <use href="#i-microchip"></use></svg
-                >Fundamentals of Accelerated Computing with Modern CUDA C++
-              </h3>
-              <div class="meta">NVIDIA Deep Learning Institute</div>
-              <p>
-                Mastered GPU-accelerated computing using CUDA C++ for
-                high-performance scientific and parallel programming.
-              </p>
-              <p class="card-view-link">
-                View certificate
-                <svg class="icon card-ext-icon" aria-hidden="true">
-                  <use href="#i-link"></use>
-                </svg></p></a
-            ><a
-              class="card card--link"
-              href="https://www.credential.net/d3522394-8bfd-455b-8ec6-c5f49424223a#acc.VXtzC23o"
-              target="_blank"
-              rel="noopener noreferrer"
-              ><h3>
-                <svg class="icon card-icon" aria-hidden="true">
-                  <use href="#i-google"></use></svg
-                >Google Data Analytics Certificate
-              </h3>
-              <div class="meta">Google</div>
-              <p>
-                Comprehensive training in data analysis, visualization, and
-                reporting using industry-standard tools and workflows.
-              </p>
-              <p class="card-view-link">
-                View certificate
-                <svg class="icon card-ext-icon" aria-hidden="true">
-                  <use href="#i-link"></use>
-                </svg></p
-            ></a>
-          </div>
-        </div>
-      </section>
-
-      <section id="conferences" aria-labelledby="conferences-heading">
-        <div class="container">
-          <h2 id="conferences-heading">Conferences</h2>
-          <div id="conferences-grid" class="card-grid">
-            <article class="card">
-              <h3>XXVI Czech–Polish seminar</h3>
-              <div class="meta">4-8 May 2026</div>
-              <p>
-                Presented “Deep Learning Frameworks for Exploration of Energy
-                Landscapes of Perovskites”. Milovy, Czech Republic.
-              </p>
-            </article>
-            <article class="card">
-              <h3>The 15th European Meeting on Ferroelectricity</h3>
-              <div class="meta">31 Aug-5 Sep 2025</div>
-              <p>
-                Poster: “Machine-learning-based Investigation of the Energy
-                Landscape of PbTiO₃, BaTiO₃ and CaTiO₃”. International Congress
-                Centre (ICC), Katowice, Poland.
-              </p>
-            </article>
-            <article class="card">
-              <h3>
-                Workshop on Classical &amp; Quantum Machine Learning for
-                Condensed Matter Physics
-              </h3>
-              <div class="meta">19-21 Jun 2024</div>
-              <p>Online workshop organized by ICTP Trieste, Italy.</p>
-            </article>
-            <article class="card">
-              <h3>e-INFRA CZ CONFERENCE</h3>
-              <div class="meta">29-30 Apr 2024</div>
-              <p>Hotel Occidental Praha, Prague.</p>
-            </article>
-            <article class="card">
-              <h3>
-                Introductory School on Parallel Programming and Architecture
-              </h3>
-              <div class="meta">3-14 Oct 2016</div>
-              <p>ICTP, Miramare, Trieste, Italy.</p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section id="teaching" aria-labelledby="teaching-heading">
-        <div class="container">
-          <h2 id="teaching-heading">Teaching experience</h2>
-          <div id="teaching-grid" class="card-grid">
-            <article class="card">
-              <h3>Visiting Faculty</h3>
-              <div class="meta">Interdisciplinary School of Science, SPPU</div>
-              <p>
-                Taught Quantum Mechanics, Statistical Mechanics and Subatomic
-                Physics to second-year B.Sc. students on the blended course.
-              </p>
-            </article>
-            <article class="card">
-              <h3>Visiting Faculty</h3>
-              <div class="meta">
-                School of Bioengineering Science and Research, MIT-ADT
-                University
-              </div>
-              <p>
-                Delivered Basic Mechanical Engineering lectures and practicals
-                to first-year B.Tech and M.Tech students, through December 2020.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section id="contact" aria-labelledby="contact-heading">
-        <div class="container">
-          <h2 id="contact-heading">Contact</h2>
-          <p>Interested in collaboration? Feel free to reach out.</p>
-          <a href="mailto:mukeshkhanore@gmail.com" class="btn">Get in Touch</a>
+          </p>
         </div>
       </section>
     </main>

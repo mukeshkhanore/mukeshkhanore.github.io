@@ -14,8 +14,6 @@ exclude = [
   # analytics origin serves nothing at "/", so it 404s or 403s. These hosts
   # appear only in the CSP or as a script/style src.
   "^https://\\*\\.", # wildcard CSP entries, e.g. https://*.cookiefirst.com
-  "fonts\\.googleapis\\.com",
-  "fonts\\.gstatic\\.com",
   "googletagmanager\\.com",
   "google-analytics\\.com",
   "analytics\\.google\\.com",
