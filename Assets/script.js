@@ -63,6 +63,7 @@ const ICON_IDS = new Set([
   "researchgate",
   "sun",
   "users",
+  "x",
 ]);
 
 /**
@@ -1291,20 +1292,62 @@ function initNav() {
   // Must match the drawer breakpoint in style.css. Off-screen links stayed in
   // the tab order, so keyboard users walked through a menu they could not see.
   const drawer = window.matchMedia("(max-width: 767.98px)");
+  const glyph = hamburger.querySelector("use");
+
+  /*
+   * Tap-outside-to-dismiss. Built here rather than authored into four pages,
+   * where it would also have to survive the pre-render diff and html-validate.
+   * It sits above main (z-index 1) and below the header (z-index 100), so the
+   * drawer and the controls that toggle it stay on top of it.
+   */
+  const scrim = document.createElement("div");
+  scrim.className = "nav-scrim";
+  scrim.hidden = true;
+  document.body.appendChild(scrim);
+
+  /*
+   * The drawer precedes the hamburger in the DOM, so Tab from the button ran
+   * into the page instead of the menu and the links were reachable only by
+   * shift-tabbing backwards. Focus is moved and cycled explicitly instead.
+   */
+  const stops = () =>
+    [hamburger, ...navLinks.querySelectorAll("a")].filter(
+      (el) => el === hamburger || el.offsetParent !== null,
+    );
 
   const setOpen = (open) => {
     navLinks.classList.toggle("active", open);
     hamburger.setAttribute("aria-expanded", String(open));
+    // The button is the only way back out, so it has to stop looking like the
+    // way in: menu bars open, a cross closed.
+    hamburger.setAttribute(
+      "aria-label",
+      open ? "Close navigation" : "Open navigation",
+    );
+    if (glyph) glyph.setAttribute("href", open ? "#i-x" : "#i-menu");
     // Without this the page behind the drawer scrolls under your finger.
     document.body.classList.toggle("nav-open", open);
     // `inert` rather than aria-hidden: html-validate's hidden-focusable rule
     // rejects aria-hidden on a container holding focusable links, and inert
     // removes them from the tab order as well as the accessibility tree.
     navLinks.inert = drawer.matches && !open;
+    scrim.hidden = !(open && drawer.matches);
   };
 
   hamburger.addEventListener("click", () => {
-    setOpen(!navLinks.classList.contains("active"));
+    const open = !navLinks.classList.contains("active");
+    setOpen(open);
+    if (open && drawer.matches) {
+      const first = navLinks.querySelector("a");
+      if (first) first.focus();
+    } else {
+      hamburger.focus();
+    }
+  });
+
+  scrim.addEventListener("click", () => {
+    setOpen(false);
+    hamburger.focus();
   });
 
   navLinks.querySelectorAll("a").forEach((link) => {
@@ -1312,11 +1355,23 @@ function initNav() {
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape" || !navLinks.classList.contains("active"))
+    if (!navLinks.classList.contains("active")) return;
+
+    if (event.key === "Escape") {
+      setOpen(false);
+      // Focus was inside the drawer we just made inert; send it somewhere real.
+      hamburger.focus();
       return;
-    setOpen(false);
-    // Focus was inside the drawer we just made inert; send it somewhere real.
-    hamburger.focus();
+    }
+
+    // While the drawer covers the page, keep Tab inside it.
+    if (event.key !== "Tab" || !drawer.matches) return;
+    const items = stops();
+    if (!items.length) return;
+    const edge = event.shiftKey ? items[0] : items[items.length - 1];
+    if (document.activeElement !== edge) return;
+    event.preventDefault();
+    (event.shiftKey ? items[items.length - 1] : items[0]).focus();
   });
 
   // Resizing past the breakpoint with the drawer open would otherwise leave

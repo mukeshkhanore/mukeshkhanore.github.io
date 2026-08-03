@@ -240,6 +240,16 @@
  * at `right: -100%` is position: fixed, which contributes no scrollable
  * overflow, so nothing needs the clip.
  */
+/*
+ * Anchor targets have to clear the sticky header, which measures 77px at every
+ * width. Without this every in-page link lands with its heading underneath the
+ * header — worst on phones, where a section's top padding (48px) is less than
+ * the header is tall.
+ */
+html {
+  scroll-padding-top: 5.5rem;
+}
+
 body {
   font-family: var(--font-main);
   background-color: var(--primary-color);
@@ -432,7 +442,8 @@ nav {
   padding: var(--space-2);
 }
 
-/* WCAG 2.5.8 asks for 44px; icon plus padding came to 40px and 35px. */
+/* 44px is WCAG 2.5.5 (AAA); the AA bar, 2.5.8, is 24px. Icon plus padding came
+   to 40px and 35px, which passes AA but is still a small thing to hit. */
 .hamburger,
 .theme-toggle {
   align-items: center;
@@ -443,6 +454,18 @@ nav {
 
 .theme-toggle {
   display: inline-flex;
+}
+
+/*
+ * Both controls live inside the header, and so does the drawer. Within the
+ * header's stacking context a positioned child (.nav-links, z-index 99) paints
+ * above non-positioned ones, so the open drawer covered the only button that
+ * closes it. Positioning these lifts them back over it.
+ */
+.hamburger,
+.theme-toggle {
+  position: relative;
+  z-index: 100;
 }
 
 /*
@@ -500,9 +523,10 @@ nav {
     width: 70%;
     max-width: 300px;
     padding: var(--space-8) var(--space-4) var(--space-6);
+    /* No backdrop-filter. The narrow-screen block at the end of this file
+       switches it off again for .nav-links, so declaring it here was dead —
+       and at 0.98 alpha there is nothing behind this to blur anyway. */
     background-color: var(--overlay-bg);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     flex-direction: column;
     flex-wrap: nowrap;
     /* Not `center`. Ten items need ~700px against a 667px phone viewport, and
@@ -535,6 +559,21 @@ nav {
 /* Set by initNav() while the drawer is open, so the page behind cannot scroll. */
 body.nav-open {
   overflow: hidden;
+}
+
+/*
+ * Tap anywhere off the drawer to dismiss it. Created by initNav(), so the four
+ * pages, the pre-render and html-validate are untouched.
+ *
+ * z-index 98 puts it over main (1) and under the header (100) — and the drawer
+ * lives inside the header, so the menu and its toggle stay above the dimming
+ * while everything they cover falls behind it.
+ */
+.nav-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 98;
+  background: rgba(0, 0, 0, 0.6);
 }
 
 /* Hero Section */
@@ -570,9 +609,18 @@ body.nav-open {
   transition: opacity 0.3s ease;
 }
 
-/* Content sits above the canvas. */
+/*
+ * Content sits above the canvas.
+ *
+ * NOT header. It carries `position: sticky; z-index: 100` of its own, and this
+ * rule is written later at the same specificity (0,0,1), so listing it here
+ * silently overwrote both properties. The header stopped sticking on every page
+ * at every width, and `z-index: 1` turned it into a stacking context that main —
+ * also z-index 1, and later in the DOM — painted straight over, which put the
+ * whole mobile drawer behind the page and swallowed every tap meant for it.
+ * At z-index 100 the header already clears the canvas on its own.
+ */
 main,
-header,
 footer {
   position: relative;
   z-index: 1;
@@ -1117,12 +1165,28 @@ footer .social-links {
 }
 
 @media (max-width: 767.98px) {
-  .hero p {
+  /*
+   * The lead paragraph only. This was written as `.hero p`, which at (0,1,1)
+   * also beat `.hero-tagline` at (0,1,0) — so the smallest type in the design
+   * rendered at body size on phones, two lines of letterspaced uppercase
+   * competing with the name above it, while staying 13px on desktop.
+   */
+  .hero-summary {
     font-size: var(--fs-body);
   }
 
-  section {
+  /*
+   * `.hero` and `.page-hero` are named here because a class (0,1,0) beats the
+   * bare `section` (0,0,1), so the two hero sections were the only ones keeping
+   * their 80px desktop padding on a phone.
+   */
+  section,
+  .hero {
     padding: var(--space-7) 0;
+  }
+
+  .page-hero {
+    padding: var(--space-7) 0 var(--space-6);
   }
 }
 
@@ -1648,9 +1712,23 @@ summary:focus-visible,
 
 @media (max-width: 480px) {
   .entry-link {
-    grid-template-columns: 3rem 1fr;
     gap: var(--space-3);
     padding: var(--space-4);
+  }
+
+  /*
+   * Stated per list, not once on `.entry-link`. The two rules above are (0,2,0)
+   * and a bare `.entry-link` here is (0,1,0), so the narrow-screen grid lost to
+   * them and never applied — while the gap and padding beside it did, leaving
+   * half a rule live. Dropping the third track also removes the gutter the
+   * hidden arrow was still reserving.
+   */
+  .entry-list--pub .entry-link {
+    grid-template-columns: 3rem 1fr;
+  }
+
+  .entry-list--cert .entry-link {
+    grid-template-columns: 2rem 1fr;
   }
 
   .entry-arrow {

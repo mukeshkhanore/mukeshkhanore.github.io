@@ -70,9 +70,15 @@ const PATTERNS = [
   /icon\(\s*"fa-([a-z0-9-]+)"/g,
 ];
 
-// icon() falls back to this when handed a name it does not recognise, so it
-// has to be in the sprite even when nothing references it directly.
-const ALWAYS = ["link"];
+/*
+ * Glyphs no static reference can reach.
+ *   link  icon() falls back to it when handed a name it does not recognise.
+ *   x     initNav() swaps the hamburger to it while the drawer is open. The
+ *         reference is a setAttribute() argument, which none of the patterns
+ *         above can see, so without this line the sprite would prune it and
+ *         the open menu would lose its close button.
+ */
+const ALWAYS = ["link", "x"];
 
 /**
  * Remove generated regions before scanning: the inlined sprite, and the
